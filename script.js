@@ -1,14 +1,10 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const cards = document.querySelectorAll('.project-card, .timeline-item, .stat-card, .panel, .profile-card');
+const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card');
 
 if (!reduceMotion && cards.length) {
-  cards.forEach(card => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(16px)';
-    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-  });
+  cards.forEach(card => card.classList.add('reveal-init'));
 
   const revealed = new WeakSet();
   const reveal = (card) => {
@@ -16,6 +12,18 @@ if (!reduceMotion && cards.length) {
     revealed.add(card);
     card.style.opacity = '1';
     card.style.transform = 'translateY(0)';
+    // Drop the 0.5s reveal transition once settled, so any later
+    // cursor-driven transform (tilt) tracks the pointer at full speed
+    // instead of inheriting this slow easing. Only ever removes the
+    // class — never touches opacity/transform, since by the time this
+    // fires the tilt effect may already own those values and clearing
+    // them here would wipe out an in-progress tilt.
+    const cleanup = (e) => {
+      if (e.target !== card) return;
+      card.removeEventListener('transitionend', cleanup);
+      card.classList.remove('reveal-init');
+    };
+    card.addEventListener('transitionend', cleanup);
   };
 
   if ('IntersectionObserver' in window) {
@@ -47,10 +55,12 @@ if (!reduceMotion && cards.length) {
   revealStragglers();
 }
 
+const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+
 // cursor-reactive spotlight — only for devices with a real mouse
 const glow = document.querySelector('.cursor-glow');
 if (glow) {
-  if (!reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+  if (!reduceMotion && hasFinePointer) {
     window.addEventListener('pointermove', (e) => {
       glow.style.setProperty('--x', e.clientX + 'px');
       glow.style.setProperty('--y', e.clientY + 'px');
@@ -58,4 +68,27 @@ if (glow) {
   } else {
     glow.remove();
   }
+}
+
+// cursor-reactive tilt + glare on cards
+if (!reduceMotion && hasFinePointer) {
+  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card');
+  tiltCards.forEach(card => {
+    card.classList.add('tilt-card');
+
+    card.addEventListener('pointermove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      card.style.setProperty('--mx', `${px * 100}%`);
+      card.style.setProperty('--my', `${py * 100}%`);
+      const rotateY = (px - 0.5) * 8;
+      const rotateX = (0.5 - py) * 8;
+      card.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+    });
+
+    card.addEventListener('pointerleave', () => {
+      card.style.transform = '';
+    });
+  });
 }
