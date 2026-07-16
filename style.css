@@ -48,6 +48,16 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; }
 
 a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-offset: 2px; }
 
+/* cursor-reactive spotlight */
+.cursor-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(550px circle at var(--x, 50%) var(--y, 20%), rgba(130, 155, 255, 0.16), transparent 70%);
+  transition: background-color 0.2s ease;
+}
+
 /* header / nav */
 .site-header { position: sticky; top: 0; z-index: 20; display: flex; justify-content: center; padding: 20px 24px 0; }
 .nav-pill {
@@ -77,7 +87,7 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-
   .nav-links a:nth-child(2) { display: none; }
 }
 
-main { padding: 0 24px; max-width: 1080px; margin: 0 auto; }
+main { position: relative; z-index: 1; padding: 0 24px; max-width: 1080px; margin: 0 auto; }
 
 /* pills */
 .pill {
@@ -273,7 +283,7 @@ main { padding: 0 24px; max-width: 1080px; margin: 0 auto; }
 .contact-section .about-text { margin-left: auto; margin-right: auto; }
 
 /* footer */
-.site-footer { padding: 0 24px 40px; }
+.site-footer { position: relative; z-index: 1; padding: 0 24px 40px; }
 .footer-bar {
   max-width: 1080px;
   margin: 0 auto;
