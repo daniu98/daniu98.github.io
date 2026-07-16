@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Name — Software Developer</title>
-  <meta name="description" content="Portfolio of Your Name, software developer.">
+  <title>Daniel Xiao — Software Engineer</title>
+  <meta name="description" content="Portfolio of Daniel Xiao — CS student at UCLA, Software Engineer Intern at Bumblebee Networks.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -19,9 +19,10 @@
   <div class="reg-mark reg-br" aria-hidden="true"></div>
 
   <header class="site-header">
-    <a href="#top" class="logo">YN</a>
+    <a href="#top" class="logo">DX</a>
     <nav>
       <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -31,9 +32,9 @@
 
     <!-- HERO -->
     <section class="hero">
-      <p class="eyebrow">Drawing No. 001 — Portfolio</p>
-      <h1>Your Name</h1>
-      <p class="tagline">Full-stack developer who builds fast, accessible, well-engineered web apps.</p>
+      <p class="eyebrow">Drawing No. 001 — Software Engineer</p>
+      <h1>Daniel Xiao</h1>
+      <p class="tagline">CS student at UCLA building backend systems, applied ML, and embedded robotics — currently interning at Bumblebee Networks.</p>
       <div class="hero-actions">
         <a href="#work" class="btn btn-primary">View work</a>
         <a href="#contact" class="btn btn-ghost">Get in touch</a>
@@ -53,15 +54,14 @@
             <div class="project-thumb" style="--thumb-hue: 200;"></div>
           </div>
           <div class="project-body">
-            <p class="project-label">Project — 01</p>
-            <h3>Placeholder Project One</h3>
-            <p class="project-desc">One sentence describing what this app does and who it's for.</p>
+            <p class="project-label">TreeReq — Project Lead, Backend &amp; AI</p>
+            <h3>Course Prerequisite API &amp; Data Pipeline</h3>
+            <p class="project-desc">Full-stack RESTful API (FastAPI + MongoDB/Motor) serving UCLA course and prerequisite data to a React frontend, backed by a Playwright + Claude API scraping pipeline that structures raw prerequisite text into JSON across all 141 UCLA majors.</p>
             <ul class="project-stack">
-              <li>React</li><li>Node.js</li><li>PostgreSQL</li>
+              <li>FastAPI</li><li>MongoDB</li><li>React</li><li>Playwright</li><li>Claude API</li>
             </ul>
             <div class="project-links">
-              <a href="#">Live site →</a>
-              <a href="#">Source →</a>
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
             </div>
           </div>
         </article>
@@ -73,15 +73,14 @@
             <div class="project-thumb" style="--thumb-hue: 25;"></div>
           </div>
           <div class="project-body">
-            <p class="project-label">Project — 02</p>
-            <h3>Placeholder Project Two</h3>
-            <p class="project-desc">One sentence describing the problem this project solves.</p>
+            <p class="project-label">Personal Project — Sept–Dec 2025</p>
+            <h3>Autonomous Rover</h3>
+            <p class="project-desc">Arduino + Java navigation system fusing gyroscope and distance-sensor input for real-time pathfinding, with a custom Fusion 360 chassis and closed-loop sensor-motor feedback control.</p>
             <ul class="project-stack">
-              <li>Next.js</li><li>TypeScript</li><li>Prisma</li>
+              <li>Java</li><li>Arduino</li><li>Fusion 360</li>
             </ul>
             <div class="project-links">
-              <a href="#">Live site →</a>
-              <a href="#">Source →</a>
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
             </div>
           </div>
         </article>
@@ -93,15 +92,33 @@
             <div class="project-thumb" style="--thumb-hue: 155;"></div>
           </div>
           <div class="project-body">
-            <p class="project-label">Project — 03</p>
-            <h3>Placeholder Project Three</h3>
-            <p class="project-desc">One sentence on the interesting technical decision you made.</p>
+            <p class="project-label">Personal Project — Sept–Dec 2025</p>
+            <h3>MNIST Digit Classification</h3>
+            <p class="project-desc">Convolutional neural network built in PyTorch reaching 98%+ accuracy on the MNIST benchmark; evaluated multiple architectures to study tradeoffs between accuracy, training time, and overfitting.</p>
             <ul class="project-stack">
-              <li>Python</li><li>FastAPI</li><li>Docker</li>
+              <li>Python</li><li>PyTorch</li><li>NumPy</li><li>Matplotlib</li>
             </ul>
             <div class="project-links">
-              <a href="#">Live site →</a>
-              <a href="#">Source →</a>
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-frame">
+            <span class="corner c-tl"></span><span class="corner c-tr"></span>
+            <span class="corner c-bl"></span><span class="corner c-br"></span>
+            <div class="project-thumb" style="--thumb-hue: 280;"></div>
+          </div>
+          <div class="project-body">
+            <p class="project-label">UCLA IEEE — Software Engineer</p>
+            <h3>Autonomous Maze-Solving Robot</h3>
+            <p class="project-desc">DFS-based pathfinding on a resource-constrained embedded platform — low-level C++ integrating IR sensors and motor controllers, running on a custom-soldered PCB iterated through multiple hardware revisions.</p>
+            <ul class="project-stack">
+              <li>C++</li><li>Embedded Systems</li><li>PCB Design</li>
+            </ul>
+            <div class="project-links">
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
             </div>
           </div>
         </article>
@@ -109,24 +126,90 @@
       </div>
     </section>
 
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+      <h2 class="section-title"><span class="section-num">02</span> Experience</h2>
+
+      <div class="timeline">
+
+        <article class="timeline-item">
+          <p class="timeline-meta"><span>June 2026 — Present</span><span>Mountain View, CA</span></p>
+          <h3>Software Engineer Intern</h3>
+          <p class="timeline-org">Bumblebee Networks</p>
+          <ul>
+            <li>Ship features for a cloud-managed intelligent edge platform, enabling real-time WAN health monitoring and application visibility across distributed branch deployments.</li>
+            <li>Implement cellular branch failover and out-of-band device management, improving network resiliency and reducing on-site technician dependency.</li>
+            <li>Build DDoS protection and threat-detection tooling as part of a distributed defense system, mitigating port-scanning and protocol-level attacks.</li>
+          </ul>
+        </article>
+
+        <article class="timeline-item">
+          <p class="timeline-meta"><span>Feb 2026 — Present</span><span>Los Angeles, CA</span></p>
+          <h3>Project Lead, Backend &amp; AI</h3>
+          <p class="timeline-org">TreeReq</p>
+          <ul>
+            <li>Lead a cross-functional team of 9 engineers across backend and AI workstreams, coordinating sprints, data handoffs, and frontend integration.</li>
+            <li>Architect and deploy a scalable FastAPI + MongoDB (Motor) RESTful API serving UCLA course and prerequisite data.</li>
+            <li>Build a Playwright + Claude API scraping pipeline parsing unstructured prerequisite text into structured JSON across all 141 UCLA majors.</li>
+          </ul>
+        </article>
+
+        <article class="timeline-item">
+          <p class="timeline-meta"><span>Sept 2025 — June 2026</span><span>Los Angeles, CA</span></p>
+          <h3>Software Engineer</h3>
+          <p class="timeline-org">UCLA IEEE</p>
+          <ul>
+            <li>Architect autonomous maze-solving algorithms leveraging DFS and graph traversal for real-time pathfinding.</li>
+            <li>Develop low-level embedded C++ integrating IR sensors, motor controllers, and real-time decision pipelines on resource-constrained hardware.</li>
+            <li>Design and solder custom PCB circuitry for motor control and sensor integration across multiple hardware revisions.</li>
+          </ul>
+        </article>
+
+        <article class="timeline-item">
+          <p class="timeline-meta"><span>Feb 2023 — Feb 2025</span><span>West Lafayette, IN</span></p>
+          <h3>Machine Learning Research Assistant</h3>
+          <p class="timeline-org">Purdue University</p>
+          <ul>
+            <li>Developed and trained a lightweight 5K-parameter deep learning model for autonomous UAV control, achieving 3.04ms inference latency for real-time edge deployment.</li>
+            <li>Optimized obstacle-avoidance performance through hyperparameter tuning across 9,920 training epochs, achieving a consistent 27cm mean error.</li>
+            <li>Co-authored a peer-reviewed research paper and served as Lead Presenter at the AIAA Aviation and Aeronautics Forum.</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
     <!-- ABOUT -->
     <section id="about" class="section">
-      <h2 class="section-title"><span class="section-num">02</span> About</h2>
+      <h2 class="section-title"><span class="section-num">03</span> About</h2>
       <div class="about-grid">
         <p class="about-text">
-          Short bio goes here — two or three sentences about your background, what kind of
-          problems you like solving, and what you're looking for next. Keep it human, not a
-          resume rehash.
+          I'm a CS student at UCLA (GPA 3.969) who likes working at the intersection of backend
+          systems and applied ML — from real-time edge networking at Bumblebee Networks to
+          leading TreeReq's backend and AI team, with a research background in low-latency deep
+          learning for autonomous UAV control at Purdue. I'm looking for roles where I can keep
+          building systems that run in the real world, not just on a benchmark.
         </p>
         <div class="legend">
           <p class="legend-title">Legend — skills</p>
           <ul class="legend-list">
-            <li><span class="legend-swatch"></span>JavaScript / TypeScript</li>
-            <li><span class="legend-swatch"></span>React / Next.js</li>
-            <li><span class="legend-swatch"></span>Node.js</li>
-            <li><span class="legend-swatch"></span>SQL / PostgreSQL</li>
-            <li><span class="legend-swatch"></span>Python</li>
+            <li><span class="legend-swatch"></span>Java / Python / C++</li>
+            <li><span class="legend-swatch"></span>React / FastAPI</li>
+            <li><span class="legend-swatch"></span>MongoDB / SQL</li>
+            <li><span class="legend-swatch"></span>PyTorch / NumPy</li>
+            <li><span class="legend-swatch"></span>AWS / Vercel</li>
             <li><span class="legend-swatch"></span>Git / CI-CD</li>
+          </ul>
+        </div>
+        <div class="legend">
+          <p class="legend-title">Legend — education</p>
+          <ul class="legend-list">
+            <li><span class="legend-swatch"></span>UCLA, B.S. Computer Science</li>
+            <li><span class="legend-swatch"></span>Sept 2025 — Jul 2028</li>
+            <li><span class="legend-swatch"></span>GPA 3.969</li>
+            <li><span class="legend-swatch"></span>Data Structures &amp; Algorithms</li>
+            <li><span class="legend-swatch"></span>Computer Architecture</li>
+            <li><span class="legend-swatch"></span>Software Construction</li>
           </ul>
         </div>
       </div>
@@ -139,19 +222,23 @@
     <div class="tb-row">
       <div class="tb-cell">
         <p class="tb-label">Drawn by</p>
-        <p class="tb-value">Your Name</p>
+        <p class="tb-value">Daniel Xiao</p>
+      </div>
+      <div class="tb-cell">
+        <p class="tb-label">Location</p>
+        <p class="tb-value">San Jose, CA</p>
       </div>
       <div class="tb-cell">
         <p class="tb-label">Email</p>
-        <p class="tb-value"><a href="mailto:you@example.com">you@example.com</a></p>
+        <p class="tb-value"><a href="mailto:daniu9807@g.ucla.edu">daniu9807@g.ucla.edu</a></p>
       </div>
       <div class="tb-cell">
         <p class="tb-label">GitHub</p>
-        <p class="tb-value"><a href="https://github.com/yourusername">github.com/yourusername</a></p>
+        <p class="tb-value"><a href="https://github.com/daniu98" target="_blank" rel="noopener">github.com/daniu98</a></p>
       </div>
       <div class="tb-cell">
         <p class="tb-label">LinkedIn</p>
-        <p class="tb-value"><a href="https://linkedin.com/in/yourusername">linkedin.com/in/yourusername</a></p>
+        <p class="tb-value"><a href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">linkedin.com/in/daniel-xiao</a></p>
       </div>
       <div class="tb-cell">
         <p class="tb-label">Rev.</p>

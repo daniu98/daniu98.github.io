@@ -3,7 +3,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 if (!reduceMotion && 'IntersectionObserver' in window) {
-  const cards = document.querySelectorAll('.project-card');
+  const cards = document.querySelectorAll('.project-card, .timeline-item');
   cards.forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(16px)';
