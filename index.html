@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Name — Software Developer</title>
+  <meta name="description" content="Portfolio of Your Name, software developer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- corner registration marks -->
+  <div class="reg-mark reg-tl" aria-hidden="true"></div>
+  <div class="reg-mark reg-tr" aria-hidden="true"></div>
+  <div class="reg-mark reg-bl" aria-hidden="true"></div>
+  <div class="reg-mark reg-br" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a href="#top" class="logo">YN</a>
+    <nav>
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero">
+      <p class="eyebrow">Drawing No. 001 — Portfolio</p>
+      <h1>Your Name</h1>
+      <p class="tagline">Full-stack developer who builds fast, accessible, well-engineered web apps.</p>
+      <div class="hero-actions">
+        <a href="#work" class="btn btn-primary">View work</a>
+        <a href="#contact" class="btn btn-ghost">Get in touch</a>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="work" class="section">
+      <h2 class="section-title"><span class="section-num">01</span> Selected work</h2>
+
+      <div class="project-grid">
+
+        <article class="project-card">
+          <div class="project-frame">
+            <span class="corner c-tl"></span><span class="corner c-tr"></span>
+            <span class="corner c-bl"></span><span class="corner c-br"></span>
+            <div class="project-thumb" style="--thumb-hue: 200;"></div>
+          </div>
+          <div class="project-body">
+            <p class="project-label">Project — 01</p>
+            <h3>Placeholder Project One</h3>
+            <p class="project-desc">One sentence describing what this app does and who it's for.</p>
+            <ul class="project-stack">
+              <li>React</li><li>Node.js</li><li>PostgreSQL</li>
+            </ul>
+            <div class="project-links">
+              <a href="#">Live site →</a>
+              <a href="#">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-frame">
+            <span class="corner c-tl"></span><span class="corner c-tr"></span>
+            <span class="corner c-bl"></span><span class="corner c-br"></span>
+            <div class="project-thumb" style="--thumb-hue: 25;"></div>
+          </div>
+          <div class="project-body">
+            <p class="project-label">Project — 02</p>
+            <h3>Placeholder Project Two</h3>
+            <p class="project-desc">One sentence describing the problem this project solves.</p>
+            <ul class="project-stack">
+              <li>Next.js</li><li>TypeScript</li><li>Prisma</li>
+            </ul>
+            <div class="project-links">
+              <a href="#">Live site →</a>
+              <a href="#">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-frame">
+            <span class="corner c-tl"></span><span class="corner c-tr"></span>
+            <span class="corner c-bl"></span><span class="corner c-br"></span>
+            <div class="project-thumb" style="--thumb-hue: 155;"></div>
+          </div>
+          <div class="project-body">
+            <p class="project-label">Project — 03</p>
+            <h3>Placeholder Project Three</h3>
+            <p class="project-desc">One sentence on the interesting technical decision you made.</p>
+            <ul class="project-stack">
+              <li>Python</li><li>FastAPI</li><li>Docker</li>
+            </ul>
+            <div class="project-links">
+              <a href="#">Live site →</a>
+              <a href="#">Source →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2 class="section-title"><span class="section-num">02</span> About</h2>
+      <div class="about-grid">
+        <p class="about-text">
+          Short bio goes here — two or three sentences about your background, what kind of
+          problems you like solving, and what you're looking for next. Keep it human, not a
+          resume rehash.
+        </p>
+        <div class="legend">
+          <p class="legend-title">Legend — skills</p>
+          <ul class="legend-list">
+            <li><span class="legend-swatch"></span>JavaScript / TypeScript</li>
+            <li><span class="legend-swatch"></span>React / Next.js</li>
+            <li><span class="legend-swatch"></span>Node.js</li>
+            <li><span class="legend-swatch"></span>SQL / PostgreSQL</li>
+            <li><span class="legend-swatch"></span>Python</li>
+            <li><span class="legend-swatch"></span>Git / CI-CD</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER / TITLE BLOCK -->
+  <footer id="contact" class="titleblock">
+    <div class="tb-row">
+      <div class="tb-cell">
+        <p class="tb-label">Drawn by</p>
+        <p class="tb-value">Your Name</p>
+      </div>
+      <div class="tb-cell">
+        <p class="tb-label">Email</p>
+        <p class="tb-value"><a href="mailto:you@example.com">you@example.com</a></p>
+      </div>
+      <div class="tb-cell">
+        <p class="tb-label">GitHub</p>
+        <p class="tb-value"><a href="https://github.com/yourusername">github.com/yourusername</a></p>
+      </div>
+      <div class="tb-cell">
+        <p class="tb-label">LinkedIn</p>
+        <p class="tb-value"><a href="https://linkedin.com/in/yourusername">linkedin.com/in/yourusername</a></p>
+      </div>
+      <div class="tb-cell">
+        <p class="tb-label">Rev.</p>
+        <p class="tb-value" id="year"></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
