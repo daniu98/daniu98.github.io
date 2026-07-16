@@ -12,7 +12,10 @@
 </head>
 <body>
 
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar"></div></div>
   <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
 
   <header class="site-header">
     <nav class="nav-pill">
@@ -30,31 +33,7 @@
 
     <!-- HERO -->
     <section class="hero">
-      <svg class="constellation constellation-tl" viewBox="0 0 300 300" aria-hidden="true">
-        <g stroke="currentColor" stroke-width="1" fill="none" opacity="0.35">
-          <path d="M10 20 L90 80 L40 150"/>
-          <path d="M90 80 L170 40"/>
-        </g>
-        <g fill="currentColor" opacity="0.6">
-          <circle cx="10" cy="20" r="2.5"/>
-          <circle cx="90" cy="80" r="3"/>
-          <circle cx="40" cy="150" r="2"/>
-          <circle cx="170" cy="40" r="2"/>
-        </g>
-      </svg>
-      <svg class="constellation constellation-br" viewBox="0 0 300 300" aria-hidden="true">
-        <g stroke="currentColor" stroke-width="1" fill="none" opacity="0.35">
-          <path d="M290 280 L210 230 L260 160"/>
-          <path d="M210 230 L140 260"/>
-        </g>
-        <g fill="currentColor" opacity="0.6">
-          <circle cx="290" cy="280" r="2.5"/>
-          <circle cx="210" cy="230" r="3"/>
-          <circle cx="260" cy="160" r="2"/>
-          <circle cx="140" cy="260" r="2"/>
-        </g>
-      </svg>
-
+      <canvas class="particle-canvas" aria-hidden="true"></canvas>
       <div class="hero-glow" aria-hidden="true"></div>
 
       <div class="hero-inner">

@@ -1,10 +1,17 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+// ---- scroll-triggered reveal, staggered per group ----
 const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card');
 
 if (!reduceMotion && cards.length) {
-  cards.forEach(card => card.classList.add('reveal-init'));
+  cards.forEach(card => {
+    card.classList.add('reveal-init');
+    const idx = Array.prototype.indexOf.call(card.parentElement.children, card);
+    card.style.setProperty('--reveal-delay', `${Math.min(idx * 70, 280)}ms`);
+  });
 
   const revealed = new WeakSet();
   const reveal = (card) => {
@@ -12,12 +19,12 @@ if (!reduceMotion && cards.length) {
     revealed.add(card);
     card.style.opacity = '1';
     card.style.transform = 'translateY(0)';
-    // Drop the 0.5s reveal transition once settled, so any later
-    // cursor-driven transform (tilt) tracks the pointer at full speed
-    // instead of inheriting this slow easing. Only ever removes the
-    // class — never touches opacity/transform, since by the time this
-    // fires the tilt effect may already own those values and clearing
-    // them here would wipe out an in-progress tilt.
+    // Drop the reveal transition once settled, so any later cursor-driven
+    // transform (tilt) tracks the pointer at full speed instead of
+    // inheriting this slower easing. Only ever removes the class — never
+    // touches opacity/transform, since by the time this fires the tilt
+    // effect may already own those values and clearing them here would
+    // wipe out an in-progress tilt.
     const cleanup = (e) => {
       if (e.target !== card) return;
       card.removeEventListener('transitionend', cleanup);
@@ -40,24 +47,86 @@ if (!reduceMotion && cards.length) {
     cards.forEach(reveal);
   }
 
-  // Safety net: IntersectionObserver can miss a crossing during a fast or
-  // programmatic scroll. Anything already on/near screen must never stay
-  // stuck invisible, so double-check on every scroll/resize.
-  const revealStragglers = () => {
+  // Safety net: IntersectionObserver callbacks can be coalesced or skipped
+  // entirely when a smooth-scroll animation gets repeatedly interrupted and
+  // retargeted (e.g. a user clicking through nav links faster than the
+  // scroll animation settles) — 'scroll' events alone aren't reliable
+  // enough to catch every case either. Once scroll activity starts, poll
+  // every frame via rAF (doesn't depend on any particular event actually
+  // delivering) until everything is revealed, then stop — so there's zero
+  // ongoing cost while the page is idle, but nothing can stay stuck
+  // invisible once the user starts interacting.
+  let polling = false;
+  const pollStragglers = () => {
+    let allRevealed = true;
     cards.forEach(card => {
       if (revealed.has(card)) return;
       const rect = card.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 50) reveal(card);
+      if (rect.bottom > -50 && rect.top < window.innerHeight + 50) {
+        reveal(card);
+      } else {
+        allRevealed = false;
+      }
     });
+    if (!allRevealed) {
+      requestAnimationFrame(pollStragglers);
+    } else {
+      polling = false;
+    }
   };
-  window.addEventListener('scroll', revealStragglers, { passive: true });
-  window.addEventListener('resize', revealStragglers);
-  revealStragglers();
+  const kickPoll = () => {
+    if (!polling) {
+      polling = true;
+      requestAnimationFrame(pollStragglers);
+    }
+  };
+  // 'scroll' events can themselves be coalesced away by the browser during
+  // a rapidly-retargeted smooth-scroll animation, so don't rely on that
+  // alone — also kick the poll from the actual interactions that trigger
+  // programmatic scrolling (nav clicks) and from wheel/touch input.
+  window.addEventListener('scroll', kickPoll, { passive: true });
+  window.addEventListener('resize', kickPoll);
+  window.addEventListener('wheel', kickPoll, { passive: true });
+  window.addEventListener('touchmove', kickPoll, { passive: true });
+  document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', kickPoll));
+  kickPoll();
 }
 
-const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+// ---- scroll progress bar ----
+{
+  const progressBar = document.querySelector('.scroll-progress-bar');
+  if (progressBar) {
+    const updateProgress = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? Math.min(Math.max(window.scrollY / scrollable, 0), 1) : 0;
+      progressBar.style.setProperty('--progress', progress.toFixed(4));
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+  }
+}
 
-// cursor-reactive spotlight — only for devices with a real mouse
+// ---- scroll-spy nav highlighting ----
+{
+  const sections = document.querySelectorAll('main section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  if (sections.length && navLinks.length && 'IntersectionObserver' in window) {
+    const linkFor = (id) => document.querySelector(`.nav-links a[href="#${id}"]`);
+    const spy = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const link = linkFor(entry.target.id);
+        if (!link) return;
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach(s => spy.observe(s));
+  }
+}
+
+// ---- cursor-reactive spotlight — only for devices with a real mouse ----
 const glow = document.querySelector('.cursor-glow');
 if (glow) {
   if (!reduceMotion && hasFinePointer) {
@@ -70,7 +139,7 @@ if (glow) {
   }
 }
 
-// cursor-reactive tilt + glare on cards
+// ---- cursor-reactive tilt + glare on cards ----
 if (!reduceMotion && hasFinePointer) {
   const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card');
   tiltCards.forEach(card => {
@@ -91,4 +160,209 @@ if (!reduceMotion && hasFinePointer) {
       card.style.transform = '';
     });
   });
+}
+
+// ---- magnetic buttons ----
+if (!reduceMotion && hasFinePointer) {
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('pointermove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+    });
+    btn.addEventListener('pointerleave', () => {
+      btn.style.transform = '';
+    });
+  });
+}
+
+// ---- custom cursor (dot + lagging ring), only enabled once real pointer movement is confirmed ----
+if (!reduceMotion && hasFinePointer) {
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+
+  if (dot && ring) {
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = mouseX;
+    let ringY = mouseY;
+    let initialized = false;
+
+    const hoverSelector = 'a, button, .btn, .tilt-card, .social-icon';
+
+    window.addEventListener('pointermove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`;
+      if (!initialized) {
+        initialized = true;
+        ringX = mouseX;
+        ringY = mouseY;
+        dot.style.opacity = '1';
+        ring.style.opacity = '1';
+        // Only hide the OS cursor once we know the replacement is
+        // actually tracking — never hide it speculatively.
+        document.documentElement.classList.add('has-custom-cursor');
+      }
+    }, { passive: true });
+
+    document.addEventListener('pointerover', (e) => {
+      if (e.target.closest && e.target.closest(hoverSelector)) ring.classList.add('is-active');
+    });
+    document.addEventListener('pointerout', (e) => {
+      if (e.target.closest && e.target.closest(hoverSelector)) ring.classList.remove('is-active');
+    });
+
+    document.addEventListener('mouseleave', () => {
+      dot.style.opacity = '0';
+      ring.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      if (initialized) {
+        dot.style.opacity = '1';
+        ring.style.opacity = '1';
+      }
+    });
+
+    const animateRing = () => {
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      const half = ring.classList.contains('is-active') ? 27 : 17;
+      ring.style.transform = `translate3d(${ringX - half}px, ${ringY - half}px, 0)`;
+      requestAnimationFrame(animateRing);
+    };
+    requestAnimationFrame(animateRing);
+  }
+}
+
+// ---- hero name letter-in animation ----
+{
+  const heroName = document.querySelector('.hero h1');
+  if (heroName && !reduceMotion) {
+    const text = heroName.textContent.trim();
+    heroName.setAttribute('aria-label', text);
+    heroName.innerHTML = '';
+    const wrap = document.createElement('span');
+    wrap.setAttribute('aria-hidden', 'true');
+    [...text].forEach((ch, i) => {
+      const span = document.createElement('span');
+      span.textContent = ch;
+      if (ch.trim()) {
+        span.className = 'letter';
+        span.style.setProperty('--d', `${i * 35}ms`);
+      } else {
+        span.style.display = 'inline-block';
+        span.style.width = '0.3em';
+      }
+      wrap.appendChild(span);
+    });
+    heroName.appendChild(wrap);
+  }
+}
+
+// ---- animated particle network in the hero ----
+if (!reduceMotion) {
+  const canvas = document.querySelector('.particle-canvas');
+  const hero = canvas ? canvas.closest('.hero') : null;
+
+  if (canvas && hero && canvas.getContext) {
+    const ctx = canvas.getContext('2d');
+    let w = 0;
+    let h = 0;
+    let particles = [];
+    const mouse = { x: null, y: null };
+    const LINK_DIST = 130;
+    const MOUSE_DIST = 160;
+
+    const resize = () => {
+      const rect = hero.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = rect.width;
+      h = rect.height;
+      canvas.width = Math.max(1, Math.round(w * dpr));
+      canvas.height = Math.max(1, Math.round(h * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.min(70, Math.max(24, Math.round((w * h) / 16000)));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        r: Math.random() * 1.4 + 0.8,
+      }));
+    };
+
+    const step = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x <= 0 || p.x >= w) { p.vx *= -1; p.x = Math.min(Math.max(p.x, 0), w); }
+        if (p.y <= 0 || p.y >= h) { p.vy *= -1; p.y = Math.min(Math.max(p.y, 0), h); }
+      }
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i];
+          const b = particles[j];
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < LINK_DIST) {
+            ctx.strokeStyle = `rgba(150, 170, 255, ${(1 - dist / LINK_DIST) * 0.25})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+        if (mouse.x !== null) {
+          const p = particles[i];
+          const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+          if (dist < MOUSE_DIST) {
+            ctx.strokeStyle = `rgba(178, 107, 255, ${(1 - dist / MOUSE_DIST) * 0.4})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (const p of particles) {
+        ctx.fillStyle = 'rgba(222, 229, 255, 0.75)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      raf = requestAnimationFrame(step);
+    };
+
+    let raf = null;
+    const start = () => { if (raf === null) raf = requestAnimationFrame(step); };
+    const stop = () => { if (raf !== null) { cancelAnimationFrame(raf); raf = null; } };
+
+    resize();
+    start();
+    window.addEventListener('resize', resize);
+
+    if (hasFinePointer) {
+      hero.addEventListener('pointermove', (e) => {
+        const rect = hero.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      hero.addEventListener('pointerleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else start();
+    });
+  }
 }
