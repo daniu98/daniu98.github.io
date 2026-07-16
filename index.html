@@ -7,24 +7,21 @@
   <meta name="description" content="Portfolio of Daniel Xiao — CS student at UCLA, Software Engineer Intern at Bumblebee Networks.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- corner registration marks -->
-  <div class="reg-mark reg-tl" aria-hidden="true"></div>
-  <div class="reg-mark reg-tr" aria-hidden="true"></div>
-  <div class="reg-mark reg-bl" aria-hidden="true"></div>
-  <div class="reg-mark reg-br" aria-hidden="true"></div>
-
   <header class="site-header">
-    <a href="#top" class="logo">DX</a>
-    <nav>
-      <a href="#work">Work</a>
-      <a href="#experience">Experience</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+    <nav class="nav-pill">
+      <a href="#top" class="logo"><span class="logo-full">Daniel Xiao</span><span class="logo-short">DX</span></a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#achievements">Achievements</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </div>
     </nav>
   </header>
 
@@ -32,217 +29,338 @@
 
     <!-- HERO -->
     <section class="hero">
-      <p class="eyebrow">Drawing No. 001 — Software Engineer</p>
-      <h1>Daniel Xiao</h1>
-      <p class="tagline">CS student at UCLA building backend systems, applied ML, and embedded robotics — currently interning at Bumblebee Networks.</p>
-      <div class="hero-actions">
-        <a href="#work" class="btn btn-primary">View work</a>
-        <a href="#contact" class="btn btn-ghost">Get in touch</a>
-      </div>
-    </section>
+      <svg class="constellation constellation-tl" viewBox="0 0 300 300" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="1" fill="none" opacity="0.35">
+          <path d="M10 20 L90 80 L40 150"/>
+          <path d="M90 80 L170 40"/>
+        </g>
+        <g fill="currentColor" opacity="0.6">
+          <circle cx="10" cy="20" r="2.5"/>
+          <circle cx="90" cy="80" r="3"/>
+          <circle cx="40" cy="150" r="2"/>
+          <circle cx="170" cy="40" r="2"/>
+        </g>
+      </svg>
+      <svg class="constellation constellation-br" viewBox="0 0 300 300" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="1" fill="none" opacity="0.35">
+          <path d="M290 280 L210 230 L260 160"/>
+          <path d="M210 230 L140 260"/>
+        </g>
+        <g fill="currentColor" opacity="0.6">
+          <circle cx="290" cy="280" r="2.5"/>
+          <circle cx="210" cy="230" r="3"/>
+          <circle cx="260" cy="160" r="2"/>
+          <circle cx="140" cy="260" r="2"/>
+        </g>
+      </svg>
 
-    <!-- WORK -->
-    <section id="work" class="section">
-      <h2 class="section-title"><span class="section-num">01</span> Selected work</h2>
+      <div class="hero-glow" aria-hidden="true"></div>
 
-      <div class="project-grid">
-
-        <article class="project-card">
-          <div class="project-frame">
-            <span class="corner c-tl"></span><span class="corner c-tr"></span>
-            <span class="corner c-bl"></span><span class="corner c-br"></span>
-            <div class="project-thumb" style="--thumb-hue: 200;"></div>
-          </div>
-          <div class="project-body">
-            <p class="project-label">TreeReq — Project Lead, Backend &amp; AI</p>
-            <h3>Course Prerequisite API &amp; Data Pipeline</h3>
-            <p class="project-desc">Full-stack RESTful API (FastAPI + MongoDB/Motor) serving UCLA course and prerequisite data to a React frontend, backed by a Playwright + Claude API scraping pipeline that structures raw prerequisite text into JSON across all 141 UCLA majors.</p>
-            <ul class="project-stack">
-              <li>FastAPI</li><li>MongoDB</li><li>React</li><li>Playwright</li><li>Claude API</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-frame">
-            <span class="corner c-tl"></span><span class="corner c-tr"></span>
-            <span class="corner c-bl"></span><span class="corner c-br"></span>
-            <div class="project-thumb" style="--thumb-hue: 25;"></div>
-          </div>
-          <div class="project-body">
-            <p class="project-label">Personal Project — Sept–Dec 2025</p>
-            <h3>Autonomous Rover</h3>
-            <p class="project-desc">Arduino + Java navigation system fusing gyroscope and distance-sensor input for real-time pathfinding, with a custom Fusion 360 chassis and closed-loop sensor-motor feedback control.</p>
-            <ul class="project-stack">
-              <li>Java</li><li>Arduino</li><li>Fusion 360</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-frame">
-            <span class="corner c-tl"></span><span class="corner c-tr"></span>
-            <span class="corner c-bl"></span><span class="corner c-br"></span>
-            <div class="project-thumb" style="--thumb-hue: 155;"></div>
-          </div>
-          <div class="project-body">
-            <p class="project-label">Personal Project — Sept–Dec 2025</p>
-            <h3>MNIST Digit Classification</h3>
-            <p class="project-desc">Convolutional neural network built in PyTorch reaching 98%+ accuracy on the MNIST benchmark; evaluated multiple architectures to study tradeoffs between accuracy, training time, and overfitting.</p>
-            <ul class="project-stack">
-              <li>Python</li><li>PyTorch</li><li>NumPy</li><li>Matplotlib</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="project-card">
-          <div class="project-frame">
-            <span class="corner c-tl"></span><span class="corner c-tr"></span>
-            <span class="corner c-bl"></span><span class="corner c-br"></span>
-            <div class="project-thumb" style="--thumb-hue: 280;"></div>
-          </div>
-          <div class="project-body">
-            <p class="project-label">UCLA IEEE — Software Engineer</p>
-            <h3>Autonomous Maze-Solving Robot</h3>
-            <p class="project-desc">DFS-based pathfinding on a resource-constrained embedded platform — low-level C++ integrating IR sensors and motor controllers, running on a custom-soldered PCB iterated through multiple hardware revisions.</p>
-            <ul class="project-stack">
-              <li>C++</li><li>Embedded Systems</li><li>PCB Design</li>
-            </ul>
-            <div class="project-links">
-              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
-            </div>
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-    <!-- EXPERIENCE -->
-    <section id="experience" class="section">
-      <h2 class="section-title"><span class="section-num">02</span> Experience</h2>
-
-      <div class="timeline">
-
-        <article class="timeline-item">
-          <p class="timeline-meta"><span>June 2026 — Present</span><span>Mountain View, CA</span></p>
-          <h3>Software Engineer Intern</h3>
-          <p class="timeline-org">Bumblebee Networks</p>
-          <ul>
-            <li>Ship features for a cloud-managed intelligent edge platform, enabling real-time WAN health monitoring and application visibility across distributed branch deployments.</li>
-            <li>Implement cellular branch failover and out-of-band device management, improving network resiliency and reducing on-site technician dependency.</li>
-            <li>Build DDoS protection and threat-detection tooling as part of a distributed defense system, mitigating port-scanning and protocol-level attacks.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <p class="timeline-meta"><span>Feb 2026 — Present</span><span>Los Angeles, CA</span></p>
-          <h3>Project Lead, Backend &amp; AI</h3>
-          <p class="timeline-org">TreeReq</p>
-          <ul>
-            <li>Lead a cross-functional team of 9 engineers across backend and AI workstreams, coordinating sprints, data handoffs, and frontend integration.</li>
-            <li>Architect and deploy a scalable FastAPI + MongoDB (Motor) RESTful API serving UCLA course and prerequisite data.</li>
-            <li>Build a Playwright + Claude API scraping pipeline parsing unstructured prerequisite text into structured JSON across all 141 UCLA majors.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <p class="timeline-meta"><span>Sept 2025 — June 2026</span><span>Los Angeles, CA</span></p>
-          <h3>Software Engineer</h3>
-          <p class="timeline-org">UCLA IEEE</p>
-          <ul>
-            <li>Architect autonomous maze-solving algorithms leveraging DFS and graph traversal for real-time pathfinding.</li>
-            <li>Develop low-level embedded C++ integrating IR sensors, motor controllers, and real-time decision pipelines on resource-constrained hardware.</li>
-            <li>Design and solder custom PCB circuitry for motor control and sensor integration across multiple hardware revisions.</li>
-          </ul>
-        </article>
-
-        <article class="timeline-item">
-          <p class="timeline-meta"><span>Feb 2023 — Feb 2025</span><span>West Lafayette, IN</span></p>
-          <h3>Machine Learning Research Assistant</h3>
-          <p class="timeline-org">Purdue University</p>
-          <ul>
-            <li>Developed and trained a lightweight 5K-parameter deep learning model for autonomous UAV control, achieving 3.04ms inference latency for real-time edge deployment.</li>
-            <li>Optimized obstacle-avoidance performance through hyperparameter tuning across 9,920 training epochs, achieving a consistent 27cm mean error.</li>
-            <li>Co-authored a peer-reviewed research paper and served as Lead Presenter at the AIAA Aviation and Aeronautics Forum.</li>
-          </ul>
-        </article>
-
+      <div class="hero-inner">
+        <p class="pill hero-pill">👋 Hey, I'm Daniel</p>
+        <h1>Daniel Xiao</h1>
+        <p class="hero-role"><span class="grad-text">Software Engineer</span></p>
+        <p class="tagline">Currently a Software Engineer Intern at Bumblebee Networks, leading Backend &amp; AI at TreeReq, and finishing a CS degree at UCLA.</p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">View my work</a>
+          <a href="#contact" class="btn btn-ghost">Get in touch</a>
+        </div>
       </div>
     </section>
 
     <!-- ABOUT -->
     <section id="about" class="section">
-      <h2 class="section-title"><span class="section-num">03</span> About</h2>
-      <div class="about-grid">
-        <p class="about-text">
-          I'm a CS student at UCLA (GPA 3.969) who likes working at the intersection of backend
-          systems and applied ML — from real-time edge networking at Bumblebee Networks to
-          leading TreeReq's backend and AI team, with a research background in low-latency deep
-          learning for autonomous UAV control at Purdue. I'm looking for roles where I can keep
-          building systems that run in the real world, not just on a benchmark.
-        </p>
-        <div class="legend">
-          <p class="legend-title">Legend — skills</p>
-          <ul class="legend-list">
-            <li><span class="legend-swatch"></span>Java / Python / C++</li>
-            <li><span class="legend-swatch"></span>React / FastAPI</li>
-            <li><span class="legend-swatch"></span>MongoDB / SQL</li>
-            <li><span class="legend-swatch"></span>PyTorch / NumPy</li>
-            <li><span class="legend-swatch"></span>AWS / Vercel</li>
-            <li><span class="legend-swatch"></span>Git / CI-CD</li>
-          </ul>
+      <p class="section-kicker">About</p>
+      <h2 class="section-heading">Profile</h2>
+
+      <div class="about-layout">
+        <div class="profile-card">
+          <div class="avatar-frame avatar-frame-lg">
+            <img src="assets/img/profile.jpg" alt="Daniel Xiao" class="avatar-img" onerror="this.remove()">
+            <span class="avatar-fallback">DX</span>
+            <div class="profile-card-caption">
+              <p class="profile-name">Daniel Xiao</p>
+              <p class="profile-role">Software Engineer · UCLA CS</p>
+            </div>
+          </div>
         </div>
-        <div class="legend">
-          <p class="legend-title">Legend — education</p>
-          <ul class="legend-list">
-            <li><span class="legend-swatch"></span>UCLA, B.S. Computer Science</li>
-            <li><span class="legend-swatch"></span>Sept 2025 — Jul 2028</li>
-            <li><span class="legend-swatch"></span>GPA 3.969</li>
-            <li><span class="legend-swatch"></span>Data Structures &amp; Algorithms</li>
-            <li><span class="legend-swatch"></span>Computer Architecture</li>
-            <li><span class="legend-swatch"></span>Software Construction</li>
-          </ul>
+
+        <div class="profile-content">
+          <p class="about-text">
+            I'm a Computer Science student at UCLA (GPA 3.969) who likes working at the intersection
+            of backend systems and applied ML. Right now that means shipping real-time monitoring
+            and threat-detection tooling as a Software Engineer Intern at Bumblebee Networks, leading
+            the backend &amp; AI team at TreeReq, and drawing on two years of ML research at Purdue
+            building low-latency models for autonomous UAV control. I like building things that run
+            in the real world, not just on a benchmark.
+          </p>
+          <div class="pill-row">
+            <span class="pill">📍 San Jose, CA</span>
+            <span class="pill">🎓 B.S. Computer Science, UCLA</span>
+            <span class="pill">💼 SWE Intern @ Bumblebee Networks</span>
+            <span class="pill">🚀 Project Lead @ TreeReq</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="skills-edu-grid">
+        <div class="panel">
+          <p class="panel-title">Skills</p>
+
+          <p class="panel-sub">Languages</p>
+          <div class="pill-row">
+            <span class="pill pill-sm">Java</span>
+            <span class="pill pill-sm">Python</span>
+            <span class="pill pill-sm">C++</span>
+            <span class="pill pill-sm">C</span>
+            <span class="pill pill-sm">SQL</span>
+            <span class="pill pill-sm">HTML / CSS</span>
+            <span class="pill pill-sm">Swift</span>
+          </div>
+
+          <p class="panel-sub">Frameworks &amp; Libraries</p>
+          <div class="pill-row">
+            <span class="pill pill-sm">React</span>
+            <span class="pill pill-sm">FastAPI</span>
+            <span class="pill pill-sm">PyTorch</span>
+            <span class="pill pill-sm">pandas</span>
+            <span class="pill pill-sm">NumPy</span>
+            <span class="pill pill-sm">MongoDB</span>
+            <span class="pill pill-sm">Playwright</span>
+          </div>
+
+          <p class="panel-sub">Developer Tools</p>
+          <div class="pill-row">
+            <span class="pill pill-sm">Git</span>
+            <span class="pill pill-sm">AWS</span>
+            <span class="pill pill-sm">Vercel</span>
+            <span class="pill pill-sm">VS Code</span>
+            <span class="pill pill-sm">IntelliJ</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title">Education</p>
+          <div class="edu-row">
+            <div class="edu-badge">UCLA</div>
+            <div>
+              <p class="edu-school">University of California, Los Angeles</p>
+              <p class="edu-meta">B.S. Computer Science · Sept 2025 – Jul 2028 · GPA 3.969</p>
+            </div>
+          </div>
+          <p class="panel-sub">Key Coursework</p>
+          <div class="pill-row">
+            <span class="pill pill-sm">Data Structures &amp; Algorithms</span>
+            <span class="pill pill-sm">Computer Architecture</span>
+            <span class="pill pill-sm">Software Construction</span>
+            <span class="pill pill-sm">Discrete Math</span>
+            <span class="pill pill-sm">Linear Algebra</span>
+          </div>
         </div>
       </div>
     </section>
 
+    <!-- ACHIEVEMENTS -->
+    <section id="achievements" class="section">
+      <p class="section-kicker">Achievements</p>
+      <h2 class="section-heading">A few things I'm proud of</h2>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <p class="stat-number grad-text">3.969</p>
+          <p class="stat-label">GPA in B.S. Computer Science at UCLA</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number grad-text">9</p>
+          <p class="stat-label">Engineers led across TreeReq's backend &amp; AI team</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number grad-text">141</p>
+          <p class="stat-label">UCLA majors parsed into structured prerequisite data</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number grad-text">98%+</p>
+          <p class="stat-label">Accuracy from a PyTorch CNN on the MNIST benchmark</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number grad-text">3.04ms</p>
+          <p class="stat-label">Inference latency on a 5K-parameter UAV control model</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-number grad-text">9,920</p>
+          <p class="stat-label">Training epochs tuned to reach 27cm mean error</p>
+        </div>
+        <div class="stat-card stat-card-feature">
+          <p class="stat-feature-icon">📄</p>
+          <p class="stat-feature-title">Peer-Reviewed Research</p>
+          <p class="stat-label">Co-authored a paper and served as Lead Presenter at the AIAA Aviation and Aeronautics Forum.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+      <p class="section-kicker">Experience</p>
+      <h2 class="section-heading">Where I've worked</h2>
+
+      <div class="timeline">
+
+        <article class="timeline-item">
+          <div class="timeline-card">
+            <p class="timeline-meta"><span class="pill pill-sm">June 2026 — Present</span><span class="pill pill-sm">Mountain View, CA</span></p>
+            <h3>Software Engineer Intern</h3>
+            <p class="timeline-org">Bumblebee Networks</p>
+            <ul>
+              <li>Ship features for a cloud-managed intelligent edge platform, enabling real-time WAN health monitoring and application visibility across distributed branch deployments.</li>
+              <li>Implement cellular branch failover and out-of-band device management, improving network resiliency and reducing on-site technician dependency.</li>
+              <li>Build DDoS protection and threat-detection tooling as part of a distributed defense system, mitigating port-scanning and protocol-level attacks.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-card">
+            <p class="timeline-meta"><span class="pill pill-sm">Feb 2026 — Present</span><span class="pill pill-sm">Los Angeles, CA</span></p>
+            <h3>Project Lead, Backend &amp; AI</h3>
+            <p class="timeline-org">TreeReq</p>
+            <ul>
+              <li>Lead a cross-functional team of 9 engineers across backend and AI workstreams, coordinating sprints, data handoffs, and frontend integration.</li>
+              <li>Architect and deploy a scalable FastAPI + MongoDB (Motor) RESTful API serving UCLA course and prerequisite data.</li>
+              <li>Build a Playwright + Claude API scraping pipeline parsing unstructured prerequisite text into structured JSON across all 141 UCLA majors.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-card">
+            <p class="timeline-meta"><span class="pill pill-sm">Sept 2025 — June 2026</span><span class="pill pill-sm">Los Angeles, CA</span></p>
+            <h3>Software Engineer</h3>
+            <p class="timeline-org">UCLA IEEE</p>
+            <ul>
+              <li>Architect autonomous maze-solving algorithms leveraging DFS and graph traversal for real-time pathfinding.</li>
+              <li>Develop low-level embedded C++ integrating IR sensors, motor controllers, and real-time decision pipelines on resource-constrained hardware.</li>
+              <li>Design and solder custom PCB circuitry for motor control and sensor integration across multiple hardware revisions.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="timeline-item">
+          <div class="timeline-card">
+            <p class="timeline-meta"><span class="pill pill-sm">Feb 2023 — Feb 2025</span><span class="pill pill-sm">West Lafayette, IN</span></p>
+            <h3>Machine Learning Research Assistant</h3>
+            <p class="timeline-org">Purdue University</p>
+            <ul>
+              <li>Developed and trained a lightweight 5K-parameter deep learning model for autonomous UAV control, achieving 3.04ms inference latency for real-time edge deployment.</li>
+              <li>Optimized obstacle-avoidance performance through hyperparameter tuning across 9,920 training epochs, achieving a consistent 27cm mean error.</li>
+              <li>Co-authored a peer-reviewed research paper and served as Lead Presenter at the AIAA Aviation and Aeronautics Forum.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <p class="section-kicker">Projects</p>
+      <h2 class="section-heading">Selected work</h2>
+
+      <div class="project-grid">
+
+        <article class="project-card" style="--hue: 220deg;">
+          <div class="project-thumb">
+            <span class="project-thumb-glyph">🌳</span>
+          </div>
+          <div class="project-body">
+            <p class="project-label">TreeReq — Project Lead, Backend &amp; AI</p>
+            <h3>Course Prerequisite API &amp; Data Pipeline</h3>
+            <p class="project-desc">Full-stack RESTful API (FastAPI + MongoDB/Motor) serving UCLA course and prerequisite data to a React frontend, backed by a Playwright + Claude API scraping pipeline that structures raw prerequisite text into JSON across all 141 UCLA majors.</p>
+            <div class="pill-row">
+              <span class="pill pill-sm">FastAPI</span><span class="pill pill-sm">MongoDB</span><span class="pill pill-sm">React</span><span class="pill pill-sm">Playwright</span><span class="pill pill-sm">Claude API</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" style="--hue: 30deg;">
+          <div class="project-thumb">
+            <span class="project-thumb-glyph">🤖</span>
+          </div>
+          <div class="project-body">
+            <p class="project-label">Personal Project — Sept–Dec 2025</p>
+            <h3>Autonomous Rover</h3>
+            <p class="project-desc">Arduino + Java navigation system fusing gyroscope and distance-sensor input for real-time pathfinding, with a custom Fusion 360 chassis and closed-loop sensor-motor feedback control.</p>
+            <div class="pill-row">
+              <span class="pill pill-sm">Java</span><span class="pill pill-sm">Arduino</span><span class="pill pill-sm">Fusion 360</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" style="--hue: 150deg;">
+          <div class="project-thumb">
+            <span class="project-thumb-glyph">🔢</span>
+          </div>
+          <div class="project-body">
+            <p class="project-label">Personal Project — Sept–Dec 2025</p>
+            <h3>MNIST Digit Classification</h3>
+            <p class="project-desc">Convolutional neural network built in PyTorch reaching 98%+ accuracy on the MNIST benchmark; evaluated multiple architectures to study tradeoffs between accuracy, training time, and overfitting.</p>
+            <div class="pill-row">
+              <span class="pill pill-sm">Python</span><span class="pill pill-sm">PyTorch</span><span class="pill pill-sm">NumPy</span><span class="pill pill-sm">Matplotlib</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" style="--hue: 275deg;">
+          <div class="project-thumb">
+            <span class="project-thumb-glyph">🧭</span>
+          </div>
+          <div class="project-body">
+            <p class="project-label">UCLA IEEE — Software Engineer</p>
+            <h3>Autonomous Maze-Solving Robot</h3>
+            <p class="project-desc">DFS-based pathfinding on a resource-constrained embedded platform — low-level C++ integrating IR sensors and motor controllers, running on a custom-soldered PCB iterated through multiple hardware revisions.</p>
+            <div class="pill-row">
+              <span class="pill pill-sm">C++</span><span class="pill pill-sm">Embedded Systems</span><span class="pill pill-sm">PCB Design</span>
+            </div>
+            <div class="project-links">
+              <a href="https://github.com/daniu98" target="_blank" rel="noopener">Source →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact-section">
+      <p class="section-kicker">Contact</p>
+      <h2 class="section-heading">Let's build something</h2>
+      <p class="about-text">I'm always happy to talk shop — reach out if you want to chat about backend systems, ML, robotics, or anything in between.</p>
+      <a href="mailto:daniu9807@g.ucla.edu" class="btn btn-primary">Email me →</a>
+    </section>
+
   </main>
 
-  <!-- FOOTER / TITLE BLOCK -->
-  <footer id="contact" class="titleblock">
-    <div class="tb-row">
-      <div class="tb-cell">
-        <p class="tb-label">Drawn by</p>
-        <p class="tb-value">Daniel Xiao</p>
-      </div>
-      <div class="tb-cell">
-        <p class="tb-label">Location</p>
-        <p class="tb-value">San Jose, CA</p>
-      </div>
-      <div class="tb-cell">
-        <p class="tb-label">Email</p>
-        <p class="tb-value"><a href="mailto:daniu9807@g.ucla.edu">daniu9807@g.ucla.edu</a></p>
-      </div>
-      <div class="tb-cell">
-        <p class="tb-label">GitHub</p>
-        <p class="tb-value"><a href="https://github.com/daniu98" target="_blank" rel="noopener">github.com/daniu98</a></p>
-      </div>
-      <div class="tb-cell">
-        <p class="tb-label">LinkedIn</p>
-        <p class="tb-value"><a href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">linkedin.com/in/daniel-xiao</a></p>
-      </div>
-      <div class="tb-cell">
-        <p class="tb-label">Rev.</p>
-        <p class="tb-value" id="year"></p>
+  <footer class="site-footer">
+    <div class="footer-bar">
+      <p class="footer-copy">© <span id="year"></span> Daniel Xiao</p>
+      <div class="social-row">
+        <a href="https://github.com/daniu98" target="_blank" rel="noopener" aria-label="GitHub" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 .5C5.73.5.98 5.24.98 11.52c0 4.94 3.2 9.13 7.65 10.61.56.1.76-.24.76-.54 0-.27-.01-1.13-.02-2.04-3.11.68-3.77-1.32-3.77-1.32-.51-1.3-1.24-1.64-1.24-1.64-1.02-.7.08-.69.08-.69 1.12.08 1.71 1.15 1.71 1.15 1 1.71 2.63 1.22 3.27.93.1-.72.39-1.22.71-1.5-2.48-.28-5.1-1.24-5.1-5.53 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.54.23 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.62 5.24-5.12 5.52.4.35.76 1.04.76 2.1 0 1.52-.01 2.74-.01 3.11 0 .3.2.65.77.54A11.03 11.03 0 0 0 23 11.52C23 5.24 18.27.5 12 .5Z"/></svg>
+        </a>
+        <a href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener" aria-label="LinkedIn" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05c.53-.98 1.83-2 3.77-2 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.7c0-1.36-.02-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.8h-4V9Z"/></svg>
+        </a>
+        <a href="mailto:daniu9807@g.ucla.edu" aria-label="Email" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M3 5.5h18v13H3v-13Z"/><path d="m3 6 9 7 9-7"/></svg>
+        </a>
       </div>
     </div>
   </footer>
