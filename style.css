@@ -420,15 +420,15 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
   color: var(--text-dim);
   margin: 0 0 14px;
 }
-/* right-to-left auto-scrolling photo marquee; pauses on hover */
+/* left-to-right auto-scrolling photo marquee; pauses on hover */
 .marquee { overflow: hidden; margin-bottom: 36px; }
 .marquee:last-of-type { margin-bottom: 0; }
 .marquee-track { display: flex; gap: 14px; width: max-content; }
 .marquee-track.marquee-animate { animation: marquee-scroll var(--marquee-duration, 30s) linear infinite; }
 .marquee-track.marquee-animate:hover { animation-play-state: paused; }
 @keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
 .marquee.marquee-static { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .photo-card { flex: 0 0 auto; width: 170px; border-radius: var(--radius-md); }
