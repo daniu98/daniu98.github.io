@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daniel Xiao — Photography &amp; Hockey</title>
   <meta name="description" content="The creative side of Daniel Xiao — landscape and travel photography, and rec league hockey.">
+  <script>
+    (function () {
+      var stored = localStorage.getItem('portfolio-theme');
+      var theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,6 +32,7 @@
         <a href="#photography">Photography</a>
         <a href="#hockey">Hockey</a>
         <a href="index.html#contact">Contact</a>
+        <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">🌙</button>
       </div>
     </nav>
   </header>

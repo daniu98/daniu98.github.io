@@ -3,8 +3,28 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 
+// ---- light / dark theme toggle ----
+// The <head> inline script already set data-theme before first paint (no
+// flash); this just wires up the button and persistence.
+{
+  const THEME_KEY = 'portfolio-theme';
+  const toggle = document.querySelector('.theme-toggle');
+  const setIcon = (theme) => { if (toggle) toggle.textContent = theme === 'light' ? '🌙' : '☀️'; };
+  setIcon(document.documentElement.getAttribute('data-theme'));
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem(THEME_KEY, next);
+      setIcon(next);
+      document.dispatchEvent(new CustomEvent('themechange'));
+    });
+  }
+}
+
 // ---- scroll-triggered reveal, staggered per group ----
-const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .photo-card');
+const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .photo-card, .pillar-card');
 
 if (!reduceMotion && cards.length) {
   cards.forEach(card => {
@@ -141,7 +161,7 @@ if (glow) {
 
 // ---- cursor-reactive tilt + glare on cards ----
 if (!reduceMotion && hasFinePointer) {
-  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .photo-card');
+  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .photo-card, .pillar-card');
   tiltCards.forEach(card => {
     card.classList.add('tilt-card');
 
@@ -275,6 +295,18 @@ if (!reduceMotion) {
     const LINK_DIST = 130;
     const MOUSE_DIST = 160;
 
+    let dotRGB = '222, 229, 255';
+    let lineRGB = '150, 170, 255';
+    let mouseRGB = '178, 107, 255';
+    const readThemeColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      dotRGB = cs.getPropertyValue('--particle-dot').trim() || dotRGB;
+      lineRGB = cs.getPropertyValue('--particle-line').trim() || lineRGB;
+      mouseRGB = cs.getPropertyValue('--particle-mouse').trim() || mouseRGB;
+    };
+    readThemeColors();
+    document.addEventListener('themechange', readThemeColors);
+
     const resize = () => {
       const rect = hero.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -309,7 +341,7 @@ if (!reduceMotion) {
           const b = particles[j];
           const dist = Math.hypot(a.x - b.x, a.y - b.y);
           if (dist < LINK_DIST) {
-            ctx.strokeStyle = `rgba(150, 170, 255, ${(1 - dist / LINK_DIST) * 0.25})`;
+            ctx.strokeStyle = `rgba(${lineRGB}, ${(1 - dist / LINK_DIST) * 0.25})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -321,7 +353,7 @@ if (!reduceMotion) {
           const p = particles[i];
           const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
           if (dist < MOUSE_DIST) {
-            ctx.strokeStyle = `rgba(178, 107, 255, ${(1 - dist / MOUSE_DIST) * 0.4})`;
+            ctx.strokeStyle = `rgba(${mouseRGB}, ${(1 - dist / MOUSE_DIST) * 0.4})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -332,7 +364,7 @@ if (!reduceMotion) {
       }
 
       for (const p of particles) {
-        ctx.fillStyle = 'rgba(222, 229, 255, 0.75)';
+        ctx.fillStyle = `rgba(${dotRGB}, 0.75)`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();

@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daniel Xiao — Software Engineer</title>
   <meta name="description" content="Portfolio of Daniel Xiao — CS student at UCLA, Software Engineer Intern at Bumblebee Networks.">
+  <script>
+    (function () {
+      var stored = localStorage.getItem('portfolio-theme');
+      var theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,10 +29,10 @@
       <a href="#top" class="logo"><span class="logo-full">Daniel Xiao</span><span class="logo-short">DX</span></a>
       <div class="nav-links">
         <a href="#about">About</a>
-        <a href="#experience">Experience</a>
-        <a href="#projects" class="nav-collapse">Projects</a>
-        <a href="creative.html">Creative</a>
+        <a href="#experience">Work</a>
+        <a href="creative.html">Hobbies</a>
         <a href="#contact">Contact</a>
+        <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">🌙</button>
       </div>
     </nav>
   </header>
@@ -46,6 +53,30 @@
           <a href="#projects" class="btn btn-primary">View my work</a>
           <a href="#contact" class="btn btn-ghost">Get in touch</a>
         </div>
+      </div>
+    </section>
+
+    <!-- PILLARS -->
+    <section class="pillars-section">
+      <div class="pillars">
+        <a href="#about" class="pillar-card">
+          <span class="pillar-icon">👋</span>
+          <h3>About Me</h3>
+          <p>Who I am beyond the resume — background, interests, and what drives me.</p>
+          <span class="pillar-arrow">→</span>
+        </a>
+        <a href="creative.html" class="pillar-card">
+          <span class="pillar-icon">📷</span>
+          <h3>Hobbies</h3>
+          <p>Photography and hockey — the side of me that's off the clock.</p>
+          <span class="pillar-arrow">→</span>
+        </a>
+        <a href="#experience" class="pillar-card">
+          <span class="pillar-icon">💻</span>
+          <h3>Academic Work</h3>
+          <p>Experience, research, and the projects I've actually built.</p>
+          <span class="pillar-arrow">→</span>
+        </a>
       </div>
     </section>
 
