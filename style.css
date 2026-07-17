@@ -105,7 +105,7 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(550px circle at var(--x, 50%) var(--y, 20%), rgba(130, 155, 255, 0.16), transparent 70%);
+  background: radial-gradient(260px circle at var(--x, 50%) var(--y, 20%), rgba(130, 155, 255, 0.12), transparent 70%);
   transition: background-color 0.2s ease;
 }
 
@@ -131,7 +131,7 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-
 .nav-links a:hover { color: var(--text); }
 .nav-links a.active { color: var(--grad-1); }
 @media (max-width: 700px) { .nav-links { gap: 14px; } .nav-links a { font-size: 12.5px; } }
-@media (max-width: 560px) { .nav-links a:nth-child(3) { display: none; } }
+@media (max-width: 560px) { .nav-links a.nav-collapse { display: none; } }
 @media (max-width: 460px) {
   .logo-full { display: none; }
   .logo-short { display: inline; }
@@ -253,6 +253,23 @@ main { position: relative; z-index: 1; padding: 0 24px; max-width: 1080px; margi
 .profile-content { display: flex; flex-direction: column; justify-content: center; }
 .about-text { font-size: 16px; color: var(--text-muted); max-width: 560px; margin: 0 0 22px; }
 
+.creative-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  color: var(--text);
+  font-size: 14px;
+  max-width: fit-content;
+}
+.creative-cta:hover { border-color: var(--border-bright); background: var(--glass-hover); }
+.creative-cta-arrow { color: var(--grad-1); display: inline-block; transition: transform 0.2s ease; }
+.creative-cta:hover .creative-cta-arrow { transform: translateX(4px); }
+
 /* skills / education panels */
 .skills-edu-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
 .panel { background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 28px; }
@@ -297,6 +314,8 @@ main { position: relative; z-index: 1; padding: 0 24px; max-width: 1080px; margi
 .timeline-meta { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
 .timeline-item h3 { font-size: 18px; margin: 0 0 4px; }
 .timeline-org { font-size: 13.5px; color: var(--text-muted); margin: 0 0 16px; }
+.timeline-org a, .timeline-item li a { color: var(--grad-1); }
+.timeline-org a:hover, .timeline-item li a:hover { color: var(--grad-2); }
 .timeline-item ul { margin: 0; padding-left: 18px; }
 .timeline-item li { color: var(--text-muted); font-size: 14.5px; margin-bottom: 8px; }
 .timeline-item li:last-child { margin-bottom: 0; }
@@ -321,6 +340,44 @@ main { position: relative; z-index: 1; padding: 0 24px; max-width: 1080px; margi
 .project-links { display: flex; gap: 20px; font-size: 13.5px; }
 .project-links a { color: var(--grad-1); }
 .project-links a:hover { color: var(--grad-2); }
+
+/* creative page: warm accent override */
+body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
+
+/* photo gallery (creative page) */
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.photo-card { border-radius: var(--radius-md); }
+.photo-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--grad-1), var(--grad-2));
+  border: 1px solid var(--border);
+}
+.photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.photo-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  opacity: 0.85;
+}
+.photo-tag {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 12px;
+  color: #fff;
+}
+.creative-blurb { font-size: 16px; color: var(--text-muted); max-width: 640px; margin: 0 0 40px; }
 
 /* contact */
 .contact-section { text-align: center; }

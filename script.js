@@ -4,7 +4,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 
 // ---- scroll-triggered reveal, staggered per group ----
-const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card');
+const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .photo-card');
 
 if (!reduceMotion && cards.length) {
   cards.forEach(card => {
@@ -141,7 +141,7 @@ if (glow) {
 
 // ---- cursor-reactive tilt + glare on cards ----
 if (!reduceMotion && hasFinePointer) {
-  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card');
+  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .photo-card');
   tiltCards.forEach(card => {
     card.classList.add('tilt-card');
 
