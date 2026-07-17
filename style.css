@@ -425,10 +425,11 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
    the set back to back, and the animation only ever traverses exactly one
    copy's width, so the "restart" lands on a frame pixel-identical to the
    one before it — the wrap is invisible rather than a visible reset. */
-.marquee { overflow: hidden; margin-bottom: 40px; }
+.marquee { overflow: hidden; margin-bottom: 40px; padding: 18px 0; }
 .marquee:last-of-type { margin-bottom: 0; }
 .marquee-track {
   display: flex;
+  align-items: center;
   gap: 18px;
   width: max-content;
   will-change: transform;
@@ -441,7 +442,10 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
   to { transform: translate3d(-50%, 0, 0); }
 }
 .marquee.marquee-static { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.photo-card { flex: 0 0 auto; width: 260px; border-radius: var(--radius-md); }
+/* z-index lift on hover so a scaled-up photo rises above its neighbors
+   instead of being cut off by them */
+.photo-card { flex: 0 0 auto; width: 260px; border-radius: var(--radius-md); position: relative; z-index: 1; }
+.photo-card:hover { z-index: 5; }
 .photo-frame {
   position: relative;
   aspect-ratio: 3 / 2;
@@ -451,7 +455,7 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.photo-frame:hover { transform: scale(1.04); box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24); }
+.photo-card:hover .photo-frame { transform: scale(1.1); box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3); }
 .photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .photo-fallback {
   position: absolute;
