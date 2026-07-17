@@ -11,6 +11,7 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <script>
     (function () {
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
       var stored = localStorage.getItem('portfolio-theme');
       var theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
       document.documentElement.setAttribute('data-theme', theme);

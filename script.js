@@ -1,5 +1,14 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Some browsers restore the previous scroll position on reopen/back-forward
+// navigation (session restore, bfcache) even with history.scrollRestoration
+// set to 'manual' in the head — that only prevents restoration on reload.
+// Force back to the top on any load that isn't targeting a specific anchor.
+if (!location.hash) window.scrollTo(0, 0);
+window.addEventListener('pageshow', () => {
+  if (!location.hash) window.scrollTo(0, 0);
+});
+
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 
