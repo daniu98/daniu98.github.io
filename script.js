@@ -24,7 +24,9 @@ const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 }
 
 // ---- scroll-triggered reveal, staggered per group ----
-const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .pillar-card');
+// .photo-grid (static gallery) cards get reveal treatment; .marquee-track
+// (sliding preview) cards don't, since they're already moving continuously.
+const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .pillar-card, .photo-grid .photo-card');
 
 if (!reduceMotion && cards.length) {
   cards.forEach(card => {
@@ -161,7 +163,7 @@ if (glow) {
 
 // ---- cursor-reactive tilt + glare on cards ----
 if (!reduceMotion && hasFinePointer) {
-  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .pillar-card');
+  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .pillar-card, .photo-grid .photo-card');
   tiltCards.forEach(card => {
     card.classList.add('tilt-card');
 

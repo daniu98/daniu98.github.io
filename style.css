@@ -453,9 +453,14 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
   backface-visibility: hidden;
 }
 .marquee.marquee-static { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.marquee-track .photo-card { flex: 0 0 auto; width: 260px; }
+
+/* static full gallery grid, used on the dedicated nature/travel pages */
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+
 /* z-index lift on hover so a scaled-up photo rises above its neighbors
    instead of being cut off by them */
-.photo-card { flex: 0 0 auto; width: 260px; border-radius: var(--radius-md); position: relative; z-index: 1; }
+.photo-card { border-radius: var(--radius-md); position: relative; z-index: 1; }
 .photo-card:hover { z-index: 5; }
 .photo-frame {
   position: relative;
