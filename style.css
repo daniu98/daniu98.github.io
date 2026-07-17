@@ -420,6 +420,7 @@ main { position: relative; z-index: 1; padding: 0 24px; max-width: 1080px; margi
 .timeline-item ul { margin: 0; padding-left: 18px; }
 .timeline-item li { color: var(--text-muted); font-size: 14.5px; margin-bottom: 8px; }
 .timeline-item li:last-child { margin-bottom: 0; }
+.timeline-item .pill-row { margin: 18px 0 0; }
 @media (max-width: 700px) { .timeline { padding-left: 22px; } .timeline-item::before { left: -28px; } }
 
 /* project grid */
