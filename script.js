@@ -24,7 +24,7 @@ const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 }
 
 // ---- scroll-triggered reveal, staggered per group ----
-const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .photo-card, .pillar-card');
+const cards = document.querySelectorAll('.project-card, .timeline-item, .panel, .profile-card, .pillar-card');
 
 if (!reduceMotion && cards.length) {
   cards.forEach(card => {
@@ -161,7 +161,7 @@ if (glow) {
 
 // ---- cursor-reactive tilt + glare on cards ----
 if (!reduceMotion && hasFinePointer) {
-  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .photo-card, .pillar-card');
+  const tiltCards = document.querySelectorAll('.project-card, .timeline-card, .panel, .profile-card, .pillar-card');
   tiltCards.forEach(card => {
     card.classList.add('tilt-card');
 
@@ -197,63 +197,25 @@ if (!reduceMotion && hasFinePointer) {
   });
 }
 
-// ---- custom cursor (dot + lagging ring), only enabled once real pointer movement is confirmed ----
-if (!reduceMotion && hasFinePointer) {
-  const dot = document.querySelector('.cursor-dot');
-  const ring = document.querySelector('.cursor-ring');
+// ---- photo marquees: auto-scroll right-to-left, pause on hover ----
+{
+  const SPEED = 40; // px per second
+  document.querySelectorAll('.marquee').forEach(marquee => {
+    const track = marquee.querySelector('.marquee-track');
+    if (!track || !track.children.length) return;
 
-  if (dot && ring) {
-    let mouseX = -100;
-    let mouseY = -100;
-    let ringX = mouseX;
-    let ringY = mouseY;
-    let initialized = false;
+    if (reduceMotion) {
+      // Accessible fallback: no motion, just a manually scrollable strip.
+      marquee.classList.add('marquee-static');
+      return;
+    }
 
-    const hoverSelector = 'a, button, .btn, .tilt-card, .social-icon';
-
-    window.addEventListener('pointermove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      dot.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`;
-      if (!initialized) {
-        initialized = true;
-        ringX = mouseX;
-        ringY = mouseY;
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
-        // Only hide the OS cursor once we know the replacement is
-        // actually tracking — never hide it speculatively.
-        document.documentElement.classList.add('has-custom-cursor');
-      }
-    }, { passive: true });
-
-    document.addEventListener('pointerover', (e) => {
-      if (e.target.closest && e.target.closest(hoverSelector)) ring.classList.add('is-active');
-    });
-    document.addEventListener('pointerout', (e) => {
-      if (e.target.closest && e.target.closest(hoverSelector)) ring.classList.remove('is-active');
-    });
-
-    document.addEventListener('mouseleave', () => {
-      dot.style.opacity = '0';
-      ring.style.opacity = '0';
-    });
-    document.addEventListener('mouseenter', () => {
-      if (initialized) {
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
-      }
-    });
-
-    const animateRing = () => {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
-      const half = ring.classList.contains('is-active') ? 27 : 17;
-      ring.style.transform = `translate3d(${ringX - half}px, ${ringY - half}px, 0)`;
-      requestAnimationFrame(animateRing);
-    };
-    requestAnimationFrame(animateRing);
-  }
+    const originalWidth = track.scrollWidth;
+    track.insertAdjacentHTML('beforeend', track.innerHTML); // duplicate for a seamless loop
+    const duration = Math.max(originalWidth / SPEED, 8);
+    track.style.setProperty('--marquee-duration', `${duration}s`);
+    track.classList.add('marquee-animate');
+  });
 }
 
 // ---- hero name letter-in animation ----
