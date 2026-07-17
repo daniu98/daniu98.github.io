@@ -30,7 +30,10 @@
         <a href="#experience">Work</a>
         <a href="creative.html">Hobbies</a>
         <a href="#contact">Contact</a>
-        <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">🌙</button>
+        <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
       </div>
     </nav>
   </header>
@@ -43,7 +46,7 @@
       <div class="hero-glow" aria-hidden="true"></div>
 
       <div class="hero-inner">
-        <p class="pill hero-pill">👋 Hey, I'm Daniel</p>
+        <p class="pill hero-pill">Hey, I'm Daniel</p>
         <h1>Daniel Xiao</h1>
         <p class="hero-role"><span class="grad-text">Software Engineer</span></p>
         <p class="tagline">Currently a Software Engineer Intern at Bumblebee Networks, leading Backend &amp; AI at TreeReq, and finishing a CS degree at UCLA.</p>
@@ -58,19 +61,19 @@
     <section class="pillars-section">
       <div class="pillars">
         <a href="#about" class="pillar-card">
-          <span class="pillar-icon">👋</span>
+          <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
           <h3>About Me</h3>
           <p>Who I am beyond the resume — background, interests, and what drives me.</p>
           <span class="pillar-arrow">→</span>
         </a>
         <a href="creative.html" class="pillar-card">
-          <span class="pillar-icon">📷</span>
+          <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="14" r="3.5"/></svg></span>
           <h3>Hobbies</h3>
           <p>Photography and hockey — the side of me that's off the clock.</p>
           <span class="pillar-arrow">→</span>
         </a>
         <a href="#experience" class="pillar-card">
-          <span class="pillar-icon">💻</span>
+          <span class="pillar-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 3 12l6 6M15 6l6 6-6 6"/></svg></span>
           <h3>Academic Work</h3>
           <p>Experience, research, and the projects I've actually built.</p>
           <span class="pillar-arrow">→</span>
@@ -105,10 +108,10 @@
             in the real world, not just on a benchmark.
           </p>
           <div class="pill-row">
-            <span class="pill">📍 San Jose, CA</span>
-            <span class="pill">🎓 B.S. Computer Science, UCLA</span>
-            <span class="pill">💼 SWE Intern @ Bumblebee Networks</span>
-            <span class="pill">🚀 Project Lead @ TreeReq</span>
+            <span class="pill">San Jose, CA</span>
+            <span class="pill">B.S. Computer Science, UCLA</span>
+            <span class="pill">SWE Intern @ Bumblebee Networks</span>
+            <span class="pill">Project Lead @ TreeReq</span>
           </div>
           <a href="creative.html" class="creative-cta">
             <span>Off the clock, I'm behind a camera or on the ice — see my creative side</span>
@@ -156,7 +159,10 @@
         <div class="panel">
           <p class="panel-title">Education</p>
           <div class="edu-row">
-            <div class="edu-badge">UCLA</div>
+            <a href="https://ucla.edu" target="_blank" rel="noopener" class="edu-badge" aria-label="UCLA website">
+              <span class="edu-badge-fallback">UCLA</span>
+              <img src="assets/img/ucla-logo.png" alt="UCLA logo" class="edu-badge-img" onerror="this.remove()">
+            </a>
             <div>
               <p class="edu-school">University of California, Los Angeles</p>
               <p class="edu-meta">B.S. Computer Science · Sept 2025 – Jul 2028 · GPA 3.969</p>
@@ -198,7 +204,7 @@
           <div class="timeline-card">
             <p class="timeline-meta"><span class="pill pill-sm">Feb 2026 — Present</span><span class="pill pill-sm">Los Angeles, CA</span></p>
             <h3>Project Lead, Backend &amp; AI</h3>
-            <p class="timeline-org">TreeReq</p>
+            <p class="timeline-org"><a href="https://treereq.com" target="_blank" rel="noopener">TreeReq ↗</a></p>
             <ul>
               <li>Lead a cross-functional team of 9 engineers across backend and AI workstreams, coordinating sprints, data handoffs, and frontend integration.</li>
               <li>Architect and deploy a scalable FastAPI + MongoDB (Motor) RESTful API serving UCLA course and prerequisite data.</li>
@@ -245,7 +251,7 @@
 
         <article class="project-card" style="--hue: 220deg;">
           <div class="project-thumb">
-            <span class="project-thumb-glyph">🌳</span>
+            <span class="project-thumb-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7.8 7.3 10.5 16M16.2 7.3 13.5 16M8.2 6h7.6"/></svg></span>
           </div>
           <div class="project-body">
             <p class="project-label">TreeReq — Project Lead, Backend &amp; AI</p>
@@ -263,7 +269,7 @@
 
         <article class="project-card" style="--hue: 30deg;">
           <div class="project-thumb">
-            <span class="project-thumb-glyph">🤖</span>
+            <span class="project-thumb-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M19.5 4.5l-2 2M4.5 19.5l2-2M19.5 19.5l-2-2"/></svg></span>
           </div>
           <div class="project-body">
             <p class="project-label">Personal Project — Sept–Dec 2025</p>
@@ -280,7 +286,7 @@
 
         <article class="project-card" style="--hue: 150deg;">
           <div class="project-thumb">
-            <span class="project-thumb-glyph">🔢</span>
+            <span class="project-thumb-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V12M12 20V6M19 20v-5"/><path d="M3 20h18"/></svg></span>
           </div>
           <div class="project-body">
             <p class="project-label">Personal Project — Sept–Dec 2025</p>
@@ -298,7 +304,7 @@
 
         <article class="project-card" style="--hue: 275deg;">
           <div class="project-thumb">
-            <span class="project-thumb-glyph">🧭</span>
+            <span class="project-thumb-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m14.5 9.5-2 5-3 1.5 2-5 3-1.5Z"/></svg></span>
           </div>
           <div class="project-body">
             <p class="project-label">UCLA IEEE — Software Engineer</p>

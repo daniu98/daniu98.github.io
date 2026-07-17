@@ -5,19 +5,17 @@ const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 
 // ---- light / dark theme toggle ----
 // The <head> inline script already set data-theme before first paint (no
-// flash); this just wires up the button and persistence.
+// flash); this just wires up the button and persistence. Which of the two
+// icons (sun/moon) is visible is handled declaratively by CSS off the
+// data-theme attribute, so there's no icon state to manage here.
 {
   const THEME_KEY = 'portfolio-theme';
   const toggle = document.querySelector('.theme-toggle');
-  const setIcon = (theme) => { if (toggle) toggle.textContent = theme === 'light' ? '🌙' : '☀️'; };
-  setIcon(document.documentElement.getAttribute('data-theme'));
-
   if (toggle) {
     toggle.addEventListener('click', () => {
       const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem(THEME_KEY, next);
-      setIcon(next);
       document.dispatchEvent(new CustomEvent('themechange'));
     });
   }
