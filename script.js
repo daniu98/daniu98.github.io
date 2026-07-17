@@ -198,6 +198,11 @@ if (!reduceMotion && hasFinePointer) {
 }
 
 // ---- photo marquees: auto-scroll right-to-left, pause on hover ----
+// Driven by rAF with a plain pixel offset rather than a CSS keyframe
+// percentage, so the wrap point is never a snap to a fixed value — it's
+// always "subtract exactly one copy-width from wherever we currently are,"
+// which stays frame-accurate regardless of how the browser rounds layout,
+// and can never present as a visible jump.
 {
   const SPEED = 40; // px per second
   document.querySelectorAll('.marquee').forEach(marquee => {
@@ -212,9 +217,26 @@ if (!reduceMotion && hasFinePointer) {
 
     const originalWidth = track.scrollWidth;
     track.insertAdjacentHTML('beforeend', track.innerHTML); // duplicate for a seamless loop
-    const duration = Math.max(originalWidth / SPEED, 8);
-    track.style.setProperty('--marquee-duration', `${duration}s`);
-    track.classList.add('marquee-animate');
+
+    let offset = 0;
+    let paused = false;
+    let lastTime = null;
+
+    marquee.addEventListener('mouseenter', () => { paused = true; });
+    marquee.addEventListener('mouseleave', () => { paused = false; });
+
+    const frame = (now) => {
+      if (lastTime === null) lastTime = now;
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      if (!paused) {
+        offset -= SPEED * dt;
+        if (offset <= -originalWidth) offset += originalWidth;
+        track.style.transform = `translate3d(${offset}px, 0, 0)`;
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
   });
 }
 

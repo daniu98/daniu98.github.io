@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daniel Xiao — Nature Photography</title>
+  <meta name="description" content="Nature and landscape photography by Daniel Xiao.">
+  <script>
+    (function () {
+      var stored = localStorage.getItem('portfolio-theme');
+      var theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="creative">
+
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar"></div></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <nav class="nav-pill">
+      <a href="index.html#top" class="logo"><span class="logo-full">Daniel Xiao</span><span class="logo-short">DX</span></a>
+      <div class="nav-links">
+        <a href="index.html">Work</a>
+        <a href="creative.html">Creative</a>
+        <a href="travel.html">Travel</a>
+        <a href="index.html#contact">Contact</a>
+        <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">🌙</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero">
+      <canvas class="particle-canvas" aria-hidden="true"></canvas>
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="hero-inner">
+        <p class="pill hero-pill">🌲 Photography</p>
+        <h1>Nature</h1>
+        <p class="hero-role"><span class="grad-text">Landscapes &amp; Wide Open Spaces</span></p>
+        <p class="tagline">Mostly Hawai'i so far — volcanic coastlines, mountain trails, and the little things that stop me mid-hike.</p>
+        <div class="hero-actions">
+          <a href="creative.html#photography" class="btn btn-ghost">← Back to Creative</a>
+          <a href="travel.html" class="btn btn-primary">See Travel →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="section">
+      <div class="marquee">
+        <div class="marquee-track">
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Beach1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Flower1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Gecko1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Gecko2.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Gecko3.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Gecko4.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Gecko5.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Lava1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Lava2.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Mountain1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Mountain6.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Sun.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/Hawaii_Sunset1.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/6E6D5583-4539-49C6-BDAE-FB31D650BE6A.jpg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/IMG_1071.jpeg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/IMG_1080.jpeg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/IMG_1172.jpeg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/IMG_5441.jpeg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+          <article class="photo-card">
+            <div class="photo-frame">
+              <span class="photo-fallback">🌲</span>
+              <img src="assets/img/photography/nature/IMG_5445.jpeg" alt="Nature photo" class="photo-img" onerror="this.remove()">
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-bar">
+      <p class="footer-copy">© <span id="year"></span> Daniel Xiao</p>
+      <div class="social-row">
+        <a href="https://github.com/daniu98" target="_blank" rel="noopener" aria-label="GitHub" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 .5C5.73.5.98 5.24.98 11.52c0 4.94 3.2 9.13 7.65 10.61.56.1.76-.24.76-.54 0-.27-.01-1.13-.02-2.04-3.11.68-3.77-1.32-3.77-1.32-.51-1.3-1.24-1.64-1.24-1.64-1.02-.7.08-.69.08-.69 1.12.08 1.71 1.15 1.71 1.15 1 1.71 2.63 1.22 3.27.93.1-.72.39-1.22.71-1.5-2.48-.28-5.1-1.24-5.1-5.53 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.08 1.15a10.7 10.7 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.61 1.54.23 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.62 5.24-5.12 5.52.4.35.76 1.04.76 2.1 0 1.52-.01 2.74-.01 3.11 0 .3.2.65.77.54A11.03 11.03 0 0 0 23 11.52C23 5.24 18.27.5 12 .5Z"/></svg>
+        </a>
+        <a href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener" aria-label="LinkedIn" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05c.53-.98 1.83-2 3.77-2 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.7c0-1.36-.02-3.1-1.9-3.1-1.9 0-2.2 1.48-2.2 3v5.8h-4V9Z"/></svg>
+        </a>
+        <a href="mailto:daniu9807@g.ucla.edu" aria-label="Email" class="social-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M3 5.5h18v13H3v-13Z"/><path d="m3 6 9 7 9-7"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
