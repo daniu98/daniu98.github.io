@@ -451,6 +451,188 @@ if (!reduceMotion && hasFinePointer) {
   }
 }
 
+// ---- ambient Minecraft-style day/night hero scene ----
+// A quiet blocky landscape behind the particle network: a grass horizon, a
+// sun/moon that slowly arcs overhead, and small wandering mobs — a pig by
+// day, a bat plus a couple of fireflies by night. Purely decorative and
+// themed off the same data-theme attribute the torch toggle drives.
+{
+  const scene = document.querySelector('.mc-scene-canvas');
+  const sceneHero = scene ? scene.closest('.hero') : null;
+
+  if (scene && sceneHero && scene.getContext) {
+    const ctx = scene.getContext('2d');
+    let w = 0, h = 0, dpr = 1;
+    const GROUND_H = 26;
+    const CYCLE_MS = 90000;
+    const startTime = performance.now();
+
+    const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+
+    const resize = () => {
+      const rect = sceneHero.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = rect.width;
+      h = rect.height;
+      scene.width = Math.max(1, Math.round(w * dpr));
+      scene.height = Math.max(1, Math.round(h * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    // Stable per-tile shading so the ground doesn't shimmer/re-randomize each frame.
+    const TILE = 18;
+    const tileShade = (i) => (i * 2654435761) % 100 / 100; // deterministic pseudo-random 0..1
+
+    const drawGround = () => {
+      const dark = isDark();
+      const grassTop = dark ? ['#3c5a34', '#436339', '#395430'] : ['#6fae42', '#79ba49', '#66a23c'];
+      const dirt = dark ? ['#3a2a1e', '#402e21', '#35281c'] : ['#7a5230', '#835938', '#71492b'];
+      const tiles = Math.ceil(w / TILE) + 1;
+      const y = h - GROUND_H;
+      for (let i = 0; i < tiles; i++) {
+        const shade = tileShade(i);
+        const gCol = grassTop[Math.floor(shade * grassTop.length)];
+        const dCol = dirt[Math.floor(shade * dirt.length)];
+        ctx.fillStyle = gCol;
+        ctx.fillRect(i * TILE, y, TILE + 1, 6);
+        ctx.fillStyle = dCol;
+        ctx.fillRect(i * TILE, y + 6, TILE + 1, GROUND_H - 6);
+      }
+    };
+
+    const drawSunMoon = (elapsed) => {
+      const dark = isDark();
+      const progress = (elapsed % CYCLE_MS) / CYCLE_MS;
+      const margin = 40;
+      const topArea = Math.max(60, h * 0.45);
+      const x = margin + (w - margin * 2) * progress;
+      const y = 30 + topArea * (1 - Math.sin(progress * Math.PI));
+      const s = 7; // half-size of the blocky sun/moon square
+      ctx.save();
+      ctx.translate(x, y);
+      if (!dark) {
+        ctx.fillStyle = '#FFE066';
+        ctx.fillRect(-s, -s, s * 2, s * 2);
+        ctx.fillStyle = '#FFF6C9';
+        ctx.fillRect(-s + 3, -s + 3, s * 2 - 6, s * 2 - 6);
+      } else {
+        ctx.fillStyle = '#D7DEEA';
+        ctx.fillRect(-s, -s, s * 2, s * 2);
+        ctx.fillStyle = '#B7C0D1';
+        ctx.fillRect(-s + 3, -s + 2, 4, 4);
+        ctx.fillRect(2, 3, 3, 3);
+        ctx.fillRect(-2, -4, 3, 3);
+      }
+      ctx.restore();
+    };
+
+    // -- pig (day) --
+    const pig = { x: 0, dir: 1, speed: 9, pauseUntil: 0 };
+    const drawPig = (elapsed, dt) => {
+      const groundY = h - GROUND_H;
+      if (elapsed > pig.pauseUntil) {
+        pig.x += pig.dir * pig.speed * dt;
+        if (pig.x > w - 60) { pig.dir = -1; pig.pauseUntil = elapsed + 1200; }
+        if (pig.x < 20) { pig.dir = 1; pig.pauseUntil = elapsed + 1200; }
+      }
+      const bob = Math.abs(Math.sin(elapsed / 220)) * 1.4;
+      ctx.save();
+      ctx.translate(pig.x, groundY - 7 - bob);
+      ctx.scale(pig.dir, 1);
+      ctx.fillStyle = '#E9A6B4';
+      ctx.fillRect(-9, -6, 18, 10);
+      ctx.fillStyle = '#D98CA0';
+      ctx.fillRect(7, -3, 5, 5);
+      ctx.fillStyle = '#3A2A2E';
+      ctx.fillRect(4, -3, 2, 2);
+      ctx.fillStyle = '#D98CA0';
+      ctx.fillRect(-8, 4, 3, 4);
+      ctx.fillRect(5, 4, 3, 4);
+      ctx.restore();
+    };
+
+    // -- bat + fireflies (night) --
+    const bat = { t: Math.random() * 1000 };
+    const fireflies = [
+      { seed: 11, r: 1.6 },
+      { seed: 47, r: 1.3 },
+      { seed: 83, r: 1.8 },
+    ];
+    const drawBat = (elapsed) => {
+      bat.t = elapsed / 1000;
+      const x = ((bat.t * 26) % (w + 40)) - 20;
+      const y = 70 + Math.sin(bat.t * 1.6) * 22;
+      const flap = Math.abs(Math.sin(bat.t * 9));
+      const wingW = 5 + flap * 4;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = '#2B2B33';
+      ctx.fillRect(-2, -2, 4, 4);
+      ctx.fillRect(-2 - wingW, -1, wingW, 3);
+      ctx.fillRect(2, -1, wingW, 3);
+      ctx.restore();
+    };
+    const drawFireflies = (elapsed) => {
+      const groundY = h - GROUND_H;
+      fireflies.forEach((f) => {
+        const t = elapsed / 1000 + f.seed;
+        const x = (Math.sin(t * 0.4) * 0.5 + 0.5) * (w - 40) + 20;
+        const y = groundY - 18 - Math.sin(t * 0.9 + f.seed) * 10;
+        const glow = 0.5 + Math.sin(t * 2.3) * 0.5;
+        ctx.save();
+        ctx.globalAlpha = 0.4 + glow * 0.6;
+        ctx.fillStyle = '#F4E28C';
+        ctx.shadowColor = '#F4E28C';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(x, y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    };
+
+    let lastTime = null;
+    const frame = (now) => {
+      if (lastTime === null) lastTime = now;
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      const elapsed = now - startTime;
+
+      ctx.clearRect(0, 0, w, h);
+      drawSunMoon(elapsed);
+      drawGround();
+      if (isDark()) {
+        drawBat(elapsed);
+        drawFireflies(elapsed);
+      } else {
+        drawPig(elapsed, dt);
+      }
+      raf = requestAnimationFrame(frame);
+    };
+
+    let raf = null;
+    resize();
+    window.addEventListener('resize', resize);
+
+    if (reduceMotion) {
+      // Single static frame — no arc, no wandering, no flicker.
+      drawSunMoon(0);
+      drawGround();
+      if (isDark()) { drawFireflies(0); } else { pig.x = w * 0.3; drawPig(0, 0); }
+    } else {
+      raf = requestAnimationFrame(frame);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
+        } else if (raf === null) {
+          lastTime = null;
+          raf = requestAnimationFrame(frame);
+        }
+      });
+    }
+  }
+}
+
 // ---- animated particle network in the hero ----
 if (!reduceMotion) {
   const canvas = document.querySelector('.particle-canvas');
