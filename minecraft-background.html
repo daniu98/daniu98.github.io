@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Ambient Background</title>
+<style>
+  /* ============================================================
+     TWEAKABLE COLORS
+     Everything voxel-shaded uses flat solid colors (no smooth
+     gradients on the blocks themselves) to keep the blocky look.
+     The sky is the one place a gradient is used on purpose, since
+     even Minecraft's own sky is a soft blend from horizon to zenith.
+     ============================================================ */
+  :root {
+    /* grass / dirt terrain */
+    --grass-1: #6fae42;
+    --grass-2: #79ba49;
+    --grass-3: #66a23c;
+    --dirt-1:  #7a5230;
+    --dirt-2:  #835938;
+    --dirt-3:  #71492b;
+
+    /* distant hills (parallax layers, back to front) */
+    --hill-far:  #5b6b8c;
+    --hill-mid:  #4d6b52;
+    --hill-near: #3f5a42;
+
+    /* tree */
+    --trunk-color: #6b4423;
+    --leaf-1: #3f8f3f;
+    --leaf-2: #4aa34a;
+
+    /* water */
+    --water-1: #3a7bd5;
+    --water-2: #4a8fe0;
+
+    /* misc block accents */
+    --flower-red: #d9453d;
+    --flower-yellow: #f2c94c;
+    --stem-green: #4aa34a;
+    --hive-color: #b98a4b;
+    --hive-stripe: #3a2a1a;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ============================================================
+     BACKGROUND LAYER
+     Fixed + full-bleed + z-index:-1 so page content just sits on
+     top of it without any extra wiring. Nothing in here captures
+     clicks (pointer-events: none throughout).
+     ============================================================ */
+  .mc-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* -------- sky -------- */
+  .mc-sky {
+    position: absolute;
+    inset: 0;
+    /* colors are set on the fly by JS via these two custom properties */
+    background: linear-gradient(to bottom, var(--sky-top, #4a90d9), var(--sky-bottom, #bfe3f7));
+    transition: background 0.3s linear; /* smooths the periodic JS color updates */
+  }
+
+  /* -------- stars -------- */
+  .mc-stars {
+    position: absolute;
+    inset: 0;
+    opacity: var(--night-factor, 0); /* 0 = invisible by day, 1 = fully out at night */
+    transition: opacity 1.5s linear;
+  }
+  .mc-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    animation: mc-twinkle 3s ease-in-out infinite;
+  }
+  @keyframes mc-twinkle {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+
+  /* -------- sun / moon --------
+     Both are small blocky squares (no rounded corners) positioned
+     via JS-driven CSS custom properties (--cx / --cy, in px) that
+     trace an arc across the sky. See DayNightEngine in the script. */
+  .mc-celestial {
+    position: absolute;
+    left: var(--cx, -100px);
+    top: var(--cy, -100px);
+    width: 34px;
+    height: 34px;
+    transform: translate(-50%, -50%);
+    opacity: var(--vis, 0);
+    transition: opacity 0.6s linear;
+  }
+  .mc-sun {
+    background: #ffe066;
+    box-shadow: inset 6px 6px 0 0 #fff6c9;
+  }
+  .mc-moon {
+    background: #d7deea;
+    box-shadow:
+      inset 8px 6px 0 0 #b7c0d1,   /* crater */
+      inset -6px -8px 0 0 #c3cbdb; /* crater */
+  }
+
+  /* -------- ambient day/night tint over the whole scene --------
+     Warms up at dusk/dawn, cools + darkens at night. Sits above the
+     terrain/hills but below the demo content. */
+  .mc-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-color, transparent);
+    mix-blend-mode: multiply;
+    opacity: var(--overlay-opacity, 0);
+    transition: background 0.3s linear, opacity 0.3s linear;
+  }
+
+  /* -------- distant hills (parallax) -------- */
+  .mc-hills { position: absolute; inset: 0; }
+  .mc-hill {
+    position: absolute;
+    bottom: 20vh;
+    /* blocky stepped silhouette instead of a smooth curve */
+    clip-path: polygon(
+      0% 100%, 0% 40%, 10% 40%, 10% 20%, 25% 20%, 25% 35%,
+      40% 35%, 40% 10%, 55% 10%, 55% 30%, 70% 30%, 70% 15%,
+      85% 15%, 85% 45%, 100% 45%, 100% 100%
+    );
+  }
+
+  /* -------- terrain strip (grass top + dirt below) --------
+     Built from repeating-linear-gradient "tiles" so each block has a
+     hard edge and a slightly different shade, instead of one flat
+     rectangle — that's what reads as "blocky" rather than a plain bar. */
+  .mc-ground {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 22vh;
+    background-image:
+      /* grass top band */
+      repeating-linear-gradient(
+        90deg,
+        var(--grass-1) 0 26px, var(--grass-2) 26px 52px, var(--grass-3) 52px 78px
+      ),
+      /* dirt band below */
+      repeating-linear-gradient(
+        90deg,
+        var(--dirt-1) 0 30px, var(--dirt-2) 30px 60px, var(--dirt-3) 60px 90px
+      );
+    background-size: 100% 22%, 100% 100%;
+    background-position: 0 0, 0 22%;
+    background-repeat: no-repeat;
+    filter: brightness(var(--terrain-brightness, 1));
+    transition: filter 0.3s linear;
+  }
+
+  /* -------- ponds -------- */
+  .mc-pond {
+    position: absolute;
+    bottom: 6vh;
+    width: 90px;
+    height: 34px;
+    background: repeating-linear-gradient(90deg, var(--water-1) 0 15px, var(--water-2) 15px 30px);
+    animation: mc-shimmer 4s ease-in-out infinite;
+  }
+  @keyframes mc-shimmer {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.12); }
+  }
+
+  /* -------- trees -------- */
+  .mc-tree { position: absolute; bottom: 15vh; width: 40px; height: 70px; }
+  .mc-tree .trunk {
+    position: absolute;
+    left: 50%; bottom: 0;
+    width: 10px; height: 26px;
+    background: var(--trunk-color);
+    transform: translateX(-50%);
+  }
+  .mc-tree .canopy {
+    position: absolute;
+    left: 50%; bottom: 22px;
+    width: 40px; height: 40px;
+    transform: translateX(-50%);
+    background:
+      repeating-linear-gradient(90deg, var(--leaf-1) 0 10px, var(--leaf-2) 10px 20px);
+    box-shadow: 0 -10px 0 -4px var(--leaf-2); /* squares off the top a bit */
+  }
+
+  /* -------- flowers + beehive -------- */
+  .mc-flower { position: absolute; bottom: 15vh; width: 8px; }
+  .mc-flower .stem { width: 2px; height: 14px; background: var(--stem-green); margin: 0 auto; }
+  .mc-flower .bloom { width: 8px; height: 8px; margin-top: -4px; }
+  .mc-flower.red .bloom { background: var(--flower-red); }
+  .mc-flower.yellow .bloom { background: var(--flower-yellow); }
+
+  .mc-hive {
+    position: absolute;
+    bottom: 15.5vh;
+    width: 26px; height: 20px;
+    background: var(--hive-color);
+    box-shadow: inset 0 6px 0 0 var(--hive-stripe), inset 0 -6px 0 0 var(--hive-stripe);
+  }
+
+  /* ============================================================
+     ANIMALS
+     Structure: a positioning wrapper (JS animates translateX via a
+     CSS transition — this is the "walk") containing a sprite wrapper
+     (handles left/right flip + idle bob) containing the actual
+     blocky body parts.
+     ============================================================ */
+  .mc-critter-pos {
+    position: absolute;
+    bottom: 15vh;
+    left: 0;
+    /* JS sets transform: translateX(...) and the transition-duration
+       inline per-move so walk speed stays constant regardless of
+       distance. */
+  }
+  .mc-critter-sprite {
+    position: relative;
+    transform: scaleX(1);
+  }
+  .mc-critter-sprite.facing-left { transform: scaleX(-1); }
+  .mc-critter-sprite.walking .mc-critter-body { animation: mc-bob 0.5s ease-in-out infinite; }
+
+  @keyframes mc-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+
+  .mc-critter-body { position: relative; }
+  .mc-critter-body > div { position: absolute; }
+
+  /* pig */
+  .pig .mc-body   { width: 26px; height: 16px; bottom: 6px; left: 0; background: #e9a6b4; }
+  .pig .mc-snout  { width: 7px;  height: 7px;  bottom: 8px; left: 22px; background: #d98ca0; }
+  .pig .mc-legA   { width: 4px;  height: 6px;  bottom: 0;  left: 3px;  background: #d98ca0; }
+  .pig .mc-legB   { width: 4px;  height: 6px;  bottom: 0;  left: 18px; background: #d98ca0; }
+
+  /* cow */
+  .cow .mc-body   { width: 32px; height: 18px; bottom: 6px; left: 0; background: #f5f2e9; }
+  .cow .mc-patch1 { width: 10px; height: 8px;  bottom: 12px; left: 4px; background: #3a2f28; }
+  .cow .mc-patch2 { width: 8px;  height: 7px;  bottom: 6px; left: 18px; background: #3a2f28; }
+  .cow .mc-snout  { width: 8px;  height: 7px;  bottom: 8px; left: 27px; background: #e7b8a8; }
+  .cow .mc-legA   { width: 4px;  height: 6px;  bottom: 0;  left: 4px;  background: #3a2f28; }
+  .cow .mc-legB   { width: 4px;  height: 6px;  bottom: 0;  left: 22px; background: #3a2f28; }
+
+  /* chicken */
+  .chicken .mc-body  { width: 16px; height: 14px; bottom: 5px; left: 0; background: #f7f3e8; }
+  .chicken .mc-comb  { width: 5px;  height: 4px;  bottom: 16px; left: 4px; background: #d9453d; }
+  .chicken .mc-beak  { width: 4px;  height: 3px;  bottom: 9px; left: 15px; background: #f2c94c; }
+  .chicken .mc-legA  { width: 2px;  height: 5px;  bottom: 0;  left: 4px; background: #f2c94c; }
+  .chicken .mc-legB  { width: 2px;  height: 5px;  bottom: 0;  left: 10px; background: #f2c94c; }
+
+  /* sheep */
+  .sheep .mc-body  { width: 30px; height: 18px; bottom: 6px; left: 0; background: #ece7dd; }
+  .sheep .mc-face  { width: 8px;  height: 8px;  bottom: 8px; left: 24px; background: #2e2b28; }
+  .sheep .mc-legA  { width: 4px;  height: 6px;  bottom: 0;  left: 4px;  background: #2e2b28; }
+  .sheep .mc-legB  { width: 4px;  height: 6px;  bottom: 0;  left: 20px; background: #2e2b28; }
+
+  /* ============================================================
+     BEES
+     Position is driven entirely by JS (rAF loop) writing left/top
+     directly, since the motion is an irregular wobble rather than a
+     simple point-A-to-point-B transition.
+     ============================================================ */
+  .mc-bee {
+    position: absolute;
+    width: 10px;
+    height: 8px;
+    opacity: 0;
+    background: repeating-linear-gradient(90deg, #f2c94c 0 2px, #2b2118 2px 4px);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+  }
+  .mc-bee::before, .mc-bee::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    width: 4px; height: 3px;
+    background: rgba(255,255,255,0.55);
+  }
+  .mc-bee::before { left: -1px; }
+  .mc-bee::after { right: -1px; }
+
+  /* ============================================================
+     DEMO PAGE CONTENT — just to prove the background sits behind it
+     ============================================================ */
+  .demo-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    padding: 24px;
+  }
+  .demo-content h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    margin: 0 0 12px;
+  }
+  .demo-content p {
+    max-width: 520px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    opacity: 0.92;
+  }
+  .demo-card {
+    margin-top: 28px;
+    padding: 16px 22px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= BACKGROUND ================= -->
+  <div class="mc-bg" id="mcBg" aria-hidden="true">
+    <div class="mc-sky" id="mcSky"></div>
+    <div class="mc-stars" id="mcStars"></div>
+
+    <div class="mc-celestial mc-sun" id="mcSun"></div>
+    <div class="mc-celestial mc-moon" id="mcMoon"></div>
+
+    <div class="mc-hills">
+      <div class="mc-hill" style="left:-5%; width:55%; height:16vh; background:var(--hill-far); opacity:0.55;"></div>
+      <div class="mc-hill" style="left:35%; width:50%; height:13vh; background:var(--hill-far); opacity:0.5;"></div>
+      <div class="mc-hill" style="left:10%; width:45%; height:11vh; background:var(--hill-mid); opacity:0.7;"></div>
+      <div class="mc-hill" style="left:55%; width:50%; height:14vh; background:var(--hill-mid); opacity:0.65;"></div>
+    </div>
+
+    <div class="mc-ground" id="mcGround"></div>
+
+    <div class="mc-pond" style="left:8%;"></div>
+    <div class="mc-pond" style="left:70%; width:70px; height:26px;"></div>
+
+    <div class="mc-tree" style="left:15%;"><div class="trunk"></div><div class="canopy"></div></div>
+    <div class="mc-tree" style="left:28%; transform:scale(0.85);"><div class="trunk"></div><div class="canopy"></div></div>
+    <div class="mc-tree" style="left:60%;"><div class="trunk"></div><div class="canopy"></div></div>
+    <div class="mc-tree" style="left:85%; transform:scale(1.1);"><div class="trunk"></div><div class="canopy"></div></div>
+
+    <!-- flowers + hive cluster, bees wander around this zone -->
+    <div id="mcFlowerZone">
+      <div class="mc-flower red"    style="left:42%;"><div class="stem"></div><div class="bloom"></div></div>
+      <div class="mc-flower yellow" style="left:45.5%;"><div class="stem"></div><div class="bloom"></div></div>
+      <div class="mc-hive" style="left:49%;"></div>
+      <div class="mc-flower red"    style="left:53%;"><div class="stem"></div><div class="bloom"></div></div>
+    </div>
+
+    <!-- animals: each is position-wrapper > sprite-wrapper > body parts -->
+    <div class="mc-critter-pos" id="animalPig">
+      <div class="mc-critter-sprite">
+        <div class="mc-critter-body pig">
+          <div class="mc-body"></div><div class="mc-snout"></div><div class="mc-legA"></div><div class="mc-legB"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mc-critter-pos" id="animalCow">
+      <div class="mc-critter-sprite">
+        <div class="mc-critter-body cow">
+          <div class="mc-body"></div><div class="mc-patch1"></div><div class="mc-patch2"></div><div class="mc-snout"></div><div class="mc-legA"></div><div class="mc-legB"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mc-critter-pos" id="animalChicken">
+      <div class="mc-critter-sprite">
+        <div class="mc-critter-body chicken">
+          <div class="mc-body"></div><div class="mc-comb"></div><div class="mc-beak"></div><div class="mc-legA"></div><div class="mc-legB"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mc-critter-pos" id="animalSheep">
+      <div class="mc-critter-sprite">
+        <div class="mc-critter-body sheep">
+          <div class="mc-body"></div><div class="mc-face"></div><div class="mc-legA"></div><div class="mc-legB"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bees -->
+    <div class="mc-bee" id="bee1"></div>
+    <div class="mc-bee" id="bee2"></div>
+    <div class="mc-bee" id="bee3"></div>
+
+    <div class="mc-overlay" id="mcOverlay"></div>
+  </div>
+
+  <!-- ================= DEMO CONTENT ================= -->
+  <div class="demo-content">
+    <h1>Minecraft Ambient Background</h1>
+    <p>
+      This heading and paragraph are ordinary page content sitting above a
+      fixed, full-screen background layer (<code>position: fixed; z-index: -1</code>).
+      The background runs its own day/night cycle, wandering animals, and
+      bees completely independently — nothing here is required to make it work.
+    </p>
+    <div class="demo-card">Drop <code>.mc-bg</code> into any page and it just works.</div>
+  </div>
+
+<script>
+/* ================================================================
+   CONFIG — the knobs you're most likely to want to tweak live here.
+   ================================================================ */
+const CONFIG = {
+  // Full day→night→day loop length. Lower = faster cycle.
+  cycleDurationMs: 90000,
+
+  // How often the day/night engine recomputes colors/positions.
+  // The cycle is slow, so this doesn't need to be every animation
+  // frame — 100ms (10x/sec) is smooth and cheap.
+  engineTickMs: 100,
+
+  // Number of twinkling stars.
+  starCount: 60,
+
+  // Animal wandering behavior.
+  animalWalkSpeedPxPerSec: 22,   // how fast animals move while walking
+  animalMinIdleMs: 2000,
+  animalMaxIdleMs: 6000,
+  animalMinWalkMs: 1500,
+  animalMaxWalkMs: 4500,
+
+  // Bee behavior.
+  beeSpeed: 55,                  // px/sec base flight speed
+  beeWobbleAmplitude: 14,        // px of sine-wave wobble
+  beeMinHiddenMs: 4000,
+  beeMaxHiddenMs: 14000,
+  beeMinFlitMs: 3000,
+  beeMaxFlitMs: 7000,
+  beesOnlyByDay: true,           // gate new bee flights to daytime
+};
+
+/* ================================================================
+   SMALL UTILITIES
+   ================================================================ */
+const rand = (min, max) => min + Math.random() * (max - min);
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const lerpColor = (c1, c2, t) => [
+  Math.round(lerp(c1[0], c2[0], t)),
+  Math.round(lerp(c1[1], c2[1], t)),
+  Math.round(lerp(c1[2], c2[2], t)),
+];
+const rgb = (c) => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+const smoothstep = (edge0, edge1, x) => {
+  const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+};
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================================================================
+   DAY / NIGHT ENGINE
+   Drives sky color, sun/moon arc position + visibility, star
+   opacity, and the ambient terrain tint — all off one 0..1 "progress"
+   value representing where we are in the current cycle.
+
+   Keyframes below are [progress, {top, bottom}] sky colors in RGB.
+   Feel free to add more stops or change the timing — just keep the
+   list sorted by progress and starting/ending on the same color so
+   the loop doesn't jump.
+   ================================================================ */
+const SKY = {
+  night: { top: [5, 7, 15],    bottom: [19, 26, 51] },
+  dawn:  { top: [107, 110, 168], bottom: [242, 166, 90] },
+  day:   { top: [74, 144, 217],  bottom: [191, 227, 247] },
+  dusk:  { top: [74, 59, 107],   bottom: [232, 115, 90] },
+};
+
+const SKY_KEYFRAMES = [
+  [0.00, SKY.night],
+  [0.15, SKY.dawn],
+  [0.30, SKY.day],
+  [0.65, SKY.day],
+  [0.80, SKY.dusk],
+  [1.00, SKY.night],
+];
+
+// Overlay tint per phase — subtle warm at dawn/dusk, cool + dark at night.
+const OVERLAY_KEYFRAMES = [
+  [0.00, { color: [10, 12, 40],  opacity: 0.35 }],
+  [0.15, { color: [255, 150, 90], opacity: 0.18 }],
+  [0.30, { color: [255, 255, 255], opacity: 0 }],
+  [0.65, { color: [255, 255, 255], opacity: 0 }],
+  [0.80, { color: [255, 110, 80], opacity: 0.22 }],
+  [1.00, { color: [10, 12, 40],  opacity: 0.35 }],
+];
+
+function sampleKeyframes(keyframes, progress) {
+  for (let i = 0; i < keyframes.length - 1; i++) {
+    const [p0, v0] = keyframes[i];
+    const [p1, v1] = keyframes[i + 1];
+    if (progress >= p0 && progress <= p1) {
+      const t = p1 === p0 ? 0 : (progress - p0) / (p1 - p0);
+      return { t, v0, v1 };
+    }
+  }
+  return { t: 0, v0: keyframes[0][1], v1: keyframes[0][1] };
+}
+
+class DayNightEngine {
+  constructor() {
+    this.sky = document.getElementById('mcSky');
+    this.stars = document.getElementById('mcStars');
+    this.sun = document.getElementById('mcSun');
+    this.moon = document.getElementById('mcMoon');
+    this.overlay = document.getElementById('mcOverlay');
+    this.ground = document.getElementById('mcGround');
+    // Offset the clock's "zero point" so the very first tick already lands
+    // at progress 0.3 (mid-morning) instead of the true start of the cycle
+    // (deep night) — makes the scene look alive the instant the page loads.
+    this.startTime = performance.now() - CONFIG.cycleDurationMs * 0.3;
+    this.progress = 0.3;
+  }
+
+  // Public: 0..1, used by bees/animals to decide "is it daytime".
+  isDaytime() {
+    return this.progress > 0.18 && this.progress < 0.82;
+  }
+
+  tick() {
+    const elapsed = performance.now() - this.startTime;
+    this.progress = prefersReducedMotion
+      ? 0.3 // freeze at a pleasant fixed daytime frame if motion is reduced
+      : (elapsed % CONFIG.cycleDurationMs) / CONFIG.cycleDurationMs;
+
+    this._applySky();
+    this._applyCelestialBodies();
+    this._applyStars();
+    this._applyOverlay();
+  }
+
+  _applySky() {
+    const { t, v0, v1 } = sampleKeyframes(SKY_KEYFRAMES, this.progress);
+    const top = lerpColor(v0.top, v1.top, t);
+    const bottom = lerpColor(v0.bottom, v1.bottom, t);
+    this.sky.style.setProperty('--sky-top', rgb(top));
+    this.sky.style.setProperty('--sky-bottom', rgb(bottom));
+  }
+
+  _arcPositionFor(riseProgress, setProgress, wrap) {
+    // Maps the current cycle progress onto a 0(rise)->1(set) arc
+    // parameter for a body that's above the horizon between
+    // riseProgress and setProgress (wrapping past 1.0 if `wrap`).
+    let p = this.progress;
+    let start = riseProgress, end = setProgress;
+    if (wrap && p < start) p += 1;
+    if (p < start || p > end) return null; // below horizon
+    const t = (p - start) / (end - start);
+    const w = window.innerWidth;
+    const horizonY = window.innerHeight * 0.78;
+    const margin = 40;
+    const x = margin + (w - margin * 2) * t;
+    const arcHeight = window.innerHeight * 0.5;
+    const y = horizonY - Math.sin(t * Math.PI) * arcHeight;
+    const edgeFade = smoothstep(0, 0.08, t) * smoothstep(0, 0.08, 1 - t);
+    return { x, y, opacity: edgeFade };
+  }
+
+  _applyCelestialBodies() {
+    const sunPos = this._arcPositionFor(0.15, 0.80, false);
+    const moonPos = this._arcPositionFor(0.80, 1.15, true);
+
+    if (sunPos) {
+      this.sun.style.setProperty('--cx', sunPos.x + 'px');
+      this.sun.style.setProperty('--cy', sunPos.y + 'px');
+      this.sun.style.setProperty('--vis', sunPos.opacity);
+    } else {
+      this.sun.style.setProperty('--vis', 0);
+    }
+
+    if (moonPos) {
+      this.moon.style.setProperty('--cx', moonPos.x + 'px');
+      this.moon.style.setProperty('--cy', moonPos.y + 'px');
+      this.moon.style.setProperty('--vis', moonPos.opacity);
+    } else {
+      this.moon.style.setProperty('--vis', 0);
+    }
+  }
+
+  _applyStars() {
+    // Fully out by deep night, fully hidden by day, smooth in between.
+    const nightFactor = 1 - smoothstep(0.15, 0.30, this.progress) + smoothstep(0.80, 0.92, this.progress);
+    this.stars.style.setProperty('--night-factor', clamp(nightFactor, 0, 1));
+  }
+
+  _applyOverlay() {
+    const { t, v0, v1 } = sampleKeyframes(OVERLAY_KEYFRAMES, this.progress);
+    const color = lerpColor(v0.color, v1.color, t);
+    const opacity = lerp(v0.opacity, v1.opacity, t);
+    this.overlay.style.setProperty('--overlay-color', rgb(color));
+    this.overlay.style.setProperty('--overlay-opacity', opacity);
+    // Terrain reads a touch darker/desaturated as the overlay strengthens.
+    this.ground.style.setProperty('--terrain-brightness', 1 - opacity * 0.35);
+  }
+}
+
+/* ================================================================
+   STARS — generated once at fixed random positions, twinkle is pure
+   CSS (see .mc-star / @keyframes mc-twinkle); only the container's
+   overall opacity is driven by the day/night engine.
+   ================================================================ */
+function buildStars() {
+  const container = document.getElementById('mcStars');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < CONFIG.starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'mc-star';
+    star.style.left = rand(0, 100) + 'vw';
+    star.style.top = rand(0, 65) + 'vh';
+    star.style.animationDelay = rand(0, 3) + 's';
+    star.style.animationDuration = rand(2, 4.5) + 's';
+    frag.appendChild(star);
+  }
+  container.appendChild(frag);
+}
+
+/* ================================================================
+   ANIMALS — simple wander state machine per critter:
+   idle (pause) -> walk to a random nearby point -> idle -> repeat.
+   Movement itself is a CSS transition on transform (GPU-friendly);
+   JS only decides *when* and *where* to move next.
+   ================================================================ */
+class Critter {
+  constructor(el, laneMinPct, laneMaxPct) {
+    this.posEl = el;
+    this.spriteEl = el.querySelector('.mc-critter-sprite');
+    this.laneMin = laneMinPct;
+    this.laneMax = laneMaxPct;
+    this.x = rand(this.laneMin, this.laneMax) * window.innerWidth / 100;
+    this.facing = 1;
+    this.asleep = false;
+    this._place(this.x, false);
+    this._scheduleNext(true);
+  }
+
+  _place(x, animated) {
+    this.posEl.style.transition = animated ? `transform ${this._walkDuration}ms linear` : 'none';
+    this.posEl.style.transform = `translateX(${x}px)`;
+  }
+
+  _scheduleNext(initial) {
+    const idleMs = initial ? rand(0, 1500) : rand(CONFIG.animalMinIdleMs, CONFIG.animalMaxIdleMs);
+    this.spriteEl.classList.remove('walking');
+    this.timer = setTimeout(() => this._startWalk(), idleMs);
+  }
+
+  _startWalk() {
+    if (this.asleep) { this._scheduleNext(); return; }
+    const minX = this.laneMin * window.innerWidth / 100;
+    const maxX = this.laneMax * window.innerWidth / 100;
+    const targetX = clamp(this.x + rand(-160, 160), minX, maxX);
+    const dist = Math.abs(targetX - this.x);
+    this._walkDuration = Math.max(400, (dist / CONFIG.animalWalkSpeedPxPerSec) * 1000);
+
+    this.facing = targetX >= this.x ? 1 : -1;
+    this.spriteEl.classList.toggle('facing-left', this.facing === -1);
+    this.spriteEl.classList.add('walking');
+
+    this._place(targetX, true);
+    this.x = targetX;
+
+    this.timer = setTimeout(() => this._scheduleNext(), this._walkDuration);
+  }
+
+  setAsleep(asleep) {
+    this.asleep = asleep;
+    this.posEl.style.opacity = asleep ? 0.15 : 1;
+    this.posEl.style.transition += ', opacity 1.5s linear';
+  }
+}
+
+/* ================================================================
+   BEES — small state machine: hidden -> entering -> flitting ->
+   exiting -> hidden. Position is written directly (left/top) every
+   animation frame since the wobble is procedural, not a simple
+   transition between two points.
+   ================================================================ */
+class Bee {
+  constructor(el, zoneCenterPct) {
+    this.el = el;
+    this.zoneCenterPx = () => (zoneCenterPct / 100) * window.innerWidth;
+    this.groundY = () => window.innerHeight * 0.78;
+    this.state = 'hidden';
+    this.phase = rand(0, Math.PI * 2); // wobble offset so bees don't sync up
+    this.nextAt = performance.now() + rand(CONFIG.beeMinHiddenMs, CONFIG.beeMaxHiddenMs);
+    this.x = -20; this.y = 0;
+  }
+
+  update(now, dayNight) {
+    if (this.state === 'hidden') {
+      this.el.style.opacity = 0;
+      if (now >= this.nextAt && (!CONFIG.beesOnlyByDay || dayNight.isDaytime())) {
+        this._beginEnter(now);
+      }
+      return;
+    }
+
+    if (this.state === 'entering') {
+      const t = clamp((now - this.enterStart) / 1500, 0, 1);
+      this.x = lerp(this.fromX, this.zoneCenterPx(), t);
+      this.y = this.groundY() - 30 + Math.sin(now / 260 + this.phase) * CONFIG.beeWobbleAmplitude * 0.5;
+      this.el.style.opacity = t;
+      if (t >= 1) { this.state = 'flitting'; this.flitUntil = now + rand(CONFIG.beeMinFlitMs, CONFIG.beeMaxFlitMs); }
+    } else if (this.state === 'flitting') {
+      const t = now / 1000;
+      this.x = this.zoneCenterPx() + Math.sin(t * 1.3 + this.phase) * CONFIG.beeWobbleAmplitude
+              + Math.sin(t * 0.31 + this.phase) * CONFIG.beeWobbleAmplitude * 0.6;
+      this.y = this.groundY() - 34 + Math.cos(t * 1.7 + this.phase) * CONFIG.beeWobbleAmplitude * 0.7;
+      this.el.style.opacity = 1;
+      if (now >= this.flitUntil || !dayNight.isDaytime()) {
+        this.state = 'exiting';
+        this.exitStart = now;
+        this.fromX = this.x;
+        this.fromY = this.y;
+        this.exitDir = Math.random() < 0.5 ? -1 : 1;
+      }
+    } else if (this.state === 'exiting') {
+      const t = clamp((now - this.exitStart) / 1400, 0, 1);
+      const targetX = this.exitDir < 0 ? -30 : window.innerWidth + 30;
+      this.x = lerp(this.fromX, targetX, t);
+      this.y = this.fromY - t * 20;
+      this.el.style.opacity = 1 - t;
+      if (t >= 1) {
+        this.state = 'hidden';
+        this.nextAt = now + rand(CONFIG.beeMinHiddenMs, CONFIG.beeMaxHiddenMs);
+      }
+    }
+
+    this.el.style.left = this.x + 'px';
+    this.el.style.top = this.y + 'px';
+  }
+
+  _beginEnter(now) {
+    this.state = 'entering';
+    this.enterStart = now;
+    this.exitDir = Math.random() < 0.5 ? -1 : 1;
+    this.fromX = this.exitDir < 0 ? -30 : window.innerWidth + 30;
+  }
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+const dayNight = new DayNightEngine();
+buildStars();
+
+const critters = [
+  new Critter(document.getElementById('animalPig'), 5, 30),
+  new Critter(document.getElementById('animalCow'), 20, 45),
+  new Critter(document.getElementById('animalChicken'), 55, 75),
+  new Critter(document.getElementById('animalSheep'), 65, 92),
+];
+
+const bees = [
+  new Bee(document.getElementById('bee1'), 48),
+  new Bee(document.getElementById('bee2'), 50),
+  new Bee(document.getElementById('bee3'), 52),
+];
+
+// Day/night engine: cheap periodic tick (see CONFIG.engineTickMs).
+dayNight.tick();
+setInterval(() => dayNight.tick(), CONFIG.engineTickMs);
+
+// Put animals "to sleep" (faded, not wandering) during the deepest
+// part of the night. Purely cosmetic — checked on the same slow tick.
+setInterval(() => {
+  const asleep = !prefersReducedMotion && (dayNight.progress > 0.88 || dayNight.progress < 0.12);
+  critters.forEach((c) => c.setAsleep(asleep));
+}, 1000);
+
+// Bees: smooth wobble needs rAF, not the slow engine tick.
+function beeLoop(now) {
+  bees.forEach((b) => b.update(now, dayNight));
+  requestAnimationFrame(beeLoop);
+}
+if (!prefersReducedMotion) {
+  requestAnimationFrame(beeLoop);
+}
+</script>
+</body>
+</html>
