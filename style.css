@@ -489,6 +489,7 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
   background: linear-gradient(160deg, var(--grad-1), var(--grad-2));
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: zoom-in;
 }
 .photo-card:hover .photo-frame { transform: scale(1.1); box-shadow: 0 20px 44px rgba(0, 0, 0, 0.3); }
 .photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -503,6 +504,64 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
 }
 .photo-fallback svg { width: 30px; height: 30px; }
 .creative-blurb { font-size: 16px; color: var(--text-muted); max-width: 640px; margin: 0 0 40px; }
+
+/* photo lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: rgba(3, 4, 8, 0.86);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+}
+.lightbox.is-open { opacity: 1; visibility: visible; }
+.lightbox-img {
+  max-width: min(90vw, 1200px);
+  max-height: 88vh;
+  border-radius: var(--radius-md);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  transform: scale(0.96);
+  transition: transform 0.25s ease;
+}
+.lightbox.is-open .lightbox-img { transform: scale(1); }
+.lightbox-close,
+.lightbox-nav {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.lightbox-close:hover,
+.lightbox-nav:hover { background: rgba(255, 255, 255, 0.18); }
+.lightbox-close svg,
+.lightbox-nav svg { width: 20px; height: 20px; }
+.lightbox-close { top: 24px; right: 24px; }
+.lightbox-prev, .lightbox-next { top: 50%; transform: translateY(-50%); }
+.lightbox-prev { left: 24px; }
+.lightbox-next { right: 24px; }
+.lightbox-prev:hover, .lightbox-next:hover { transform: translateY(-50%) scale(1.06); }
+@media (max-width: 640px) {
+  .lightbox { padding: 20px; }
+  .lightbox-prev, .lightbox-next { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox, .lightbox-img { transition: none; }
+}
 
 /* contact */
 .contact-section { text-align: center; }

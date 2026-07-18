@@ -249,6 +249,102 @@ if (!reduceMotion && hasFinePointer) {
   });
 }
 
+// ---- photo lightbox: click a gallery/marquee photo to view it full-size ----
+{
+  const photoImgs = document.querySelectorAll('.photo-img');
+  if (photoImgs.length) {
+    const lightbox = document.createElement('div');
+    lightbox.className = 'lightbox';
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('aria-hidden', 'true');
+    lightbox.innerHTML = `
+      <button class="lightbox-close" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <img class="lightbox-img" src="" alt="">
+    `;
+    document.body.appendChild(lightbox);
+
+    const imgEl = lightbox.querySelector('.lightbox-img');
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+    const prevBtn = lightbox.querySelector('.lightbox-prev');
+    const nextBtn = lightbox.querySelector('.lightbox-next');
+
+    let group = [];
+    let index = 0;
+    let trigger = null;
+
+    const show = () => {
+      imgEl.src = group[index].src;
+      imgEl.alt = group[index].alt || '';
+      const multi = group.length > 1;
+      prevBtn.style.display = multi ? '' : 'none';
+      nextBtn.style.display = multi ? '' : 'none';
+    };
+
+    const open = (clickedImg) => {
+      // Group by the enclosing gallery/marquee so prev/next stays within it.
+      // Marquees duplicate their track for a seamless loop, so the same photo
+      // appears twice in the DOM — dedupe by src, keeping first-seen order.
+      const container = clickedImg.closest('.photo-grid, .marquee-track') || document;
+      const all = Array.from(container.querySelectorAll('.photo-img'));
+      const seen = new Set();
+      group = [];
+      all.forEach(img => {
+        if (!seen.has(img.src)) { seen.add(img.src); group.push(img); }
+      });
+      index = group.indexOf(clickedImg);
+      if (index === -1) { group = [clickedImg]; index = 0; }
+
+      trigger = clickedImg;
+      show();
+      lightbox.classList.add('is-open');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    };
+
+    const close = () => {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (trigger) trigger.focus({ preventScroll: true });
+    };
+
+    const step = (delta) => {
+      if (!group.length) return;
+      index = (index + delta + group.length) % group.length;
+      show();
+    };
+
+    document.addEventListener('click', (e) => {
+      const img = e.target.closest('.photo-img');
+      if (!img) return;
+      open(img);
+    });
+
+    closeBtn.addEventListener('click', close);
+    prevBtn.addEventListener('click', () => step(-1));
+    nextBtn.addEventListener('click', () => step(1));
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('is-open')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
+    });
+  }
+}
+
 // ---- hero name letter-in animation ----
 {
   const heroName = document.querySelector('.hero h1');
