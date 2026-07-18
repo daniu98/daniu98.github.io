@@ -26,10 +26,14 @@
     --hill-mid:  #4d6b52;
     --hill-near: #3f5a42;
 
-    /* tree */
-    --trunk-color: #6b4423;
-    --leaf-1: #3f8f3f;
-    --leaf-2: #4aa34a;
+    /* tree — cherry blossom (pale pinkish-grey wood, pink blossom canopy) */
+    --trunk-color: #cf9a9a;
+    --leaf-1: #f6c6d0;
+    --leaf-2: #fadde3;
+    --leaf-3: #eeb0c2;
+
+    /* falling petals */
+    --petal-color: #f8cdd8;
 
     /* water */
     --water-1: #3a7bd5;
@@ -91,6 +95,35 @@
   @keyframes mc-twinkle {
     0%, 100% { opacity: 0.25; }
     50% { opacity: 1; }
+  }
+
+  /* -------- falling cherry blossom petals --------
+     Pure-CSS drift: each petal gets its own randomized left position,
+     fall duration, and negative delay (via JS, see buildPetals) so
+     they don't all fall in sync. Fades out during full night since
+     it's a daytime cherry-grove detail. */
+  .mc-petals {
+    position: absolute;
+    inset: 0;
+    opacity: var(--petal-factor, 1);
+    transition: opacity 1.5s linear;
+  }
+  .mc-petal {
+    position: absolute;
+    top: -5%;
+    width: 5px;
+    height: 5px;
+    background: var(--petal-color);
+    animation: mc-petal-fall linear infinite;
+  }
+  @keyframes mc-petal-fall {
+    0%   { transform: translate(0, 0) rotate(0deg);       opacity: 0; }
+    8%   { opacity: 0.9; }
+    25%  { transform: translate(18px, 25vh) rotate(90deg); }
+    50%  { transform: translate(-14px, 50vh) rotate(180deg); }
+    75%  { transform: translate(16px, 75vh) rotate(270deg); }
+    92%  { opacity: 0.85; }
+    100% { transform: translate(-10px, 98vh) rotate(360deg); opacity: 0; }
   }
 
   /* -------- sun / moon --------
@@ -198,7 +231,7 @@
     width: 40px; height: 40px;
     transform: translateX(-50%);
     background:
-      repeating-linear-gradient(90deg, var(--leaf-1) 0 10px, var(--leaf-2) 10px 20px);
+      repeating-linear-gradient(90deg, var(--leaf-1) 0 10px, var(--leaf-3) 10px 20px, var(--leaf-2) 20px 30px, var(--leaf-1) 30px 40px);
     box-shadow: 0 -10px 0 -4px var(--leaf-2); /* squares off the top a bit */
   }
 
@@ -333,6 +366,14 @@
     backdrop-filter: blur(6px);
     font-size: 0.9rem;
   }
+
+  /* Freeze the two purely-CSS-driven loops (star twinkle, petal fall) for
+     reduced-motion users. Everything else (sun/moon arc, animal wander,
+     bees) is already gated in JS via prefersReducedMotion. */
+  @media (prefers-reduced-motion: reduce) {
+    .mc-star { animation: none; opacity: 0.7; }
+    .mc-petal { animation: none; opacity: 0; }
+  }
 </style>
 </head>
 <body>
@@ -341,6 +382,7 @@
   <div class="mc-bg" id="mcBg" aria-hidden="true">
     <div class="mc-sky" id="mcSky"></div>
     <div class="mc-stars" id="mcStars"></div>
+    <div class="mc-petals" id="mcPetals"></div>
 
     <div class="mc-celestial mc-sun" id="mcSun"></div>
     <div class="mc-celestial mc-moon" id="mcMoon"></div>
@@ -436,6 +478,9 @@ const CONFIG = {
   // Number of twinkling stars.
   starCount: 60,
 
+  // Falling cherry blossom petals.
+  petalCount: 26,
+
   // Animal wandering behavior.
   animalWalkSpeedPxPerSec: 22,   // how fast animals move while walking
   animalMinIdleMs: 2000,
@@ -524,6 +569,7 @@ class DayNightEngine {
   constructor() {
     this.sky = document.getElementById('mcSky');
     this.stars = document.getElementById('mcStars');
+    this.petals = document.getElementById('mcPetals');
     this.sun = document.getElementById('mcSun');
     this.moon = document.getElementById('mcMoon');
     this.overlay = document.getElementById('mcOverlay');
@@ -604,6 +650,8 @@ class DayNightEngine {
     // Fully out by deep night, fully hidden by day, smooth in between.
     const nightFactor = 1 - smoothstep(0.15, 0.30, this.progress) + smoothstep(0.80, 0.92, this.progress);
     this.stars.style.setProperty('--night-factor', clamp(nightFactor, 0, 1));
+    // Petals are a daytime cherry-grove detail — fade the opposite way.
+    this.petals.style.setProperty('--petal-factor', clamp(1 - nightFactor, 0.15, 1));
   }
 
   _applyOverlay() {
@@ -633,6 +681,28 @@ function buildStars() {
     star.style.animationDelay = rand(0, 3) + 's';
     star.style.animationDuration = rand(2, 4.5) + 's';
     frag.appendChild(star);
+  }
+  container.appendChild(frag);
+}
+
+/* ================================================================
+   FALLING PETALS — generated once, each with its own randomized
+   horizontal start, fall duration, and negative animation-delay
+   (starts the loop already partway through, so petals don't all
+   spawn at the top in a visible wave).
+   ================================================================ */
+function buildPetals() {
+  const container = document.getElementById('mcPetals');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < CONFIG.petalCount; i++) {
+    const petal = document.createElement('div');
+    petal.className = 'mc-petal';
+    const duration = rand(9, 16);
+    petal.style.left = rand(0, 100) + 'vw';
+    petal.style.animationDuration = duration + 's';
+    petal.style.animationDelay = -rand(0, duration) + 's';
+    petal.style.opacity = rand(0.6, 1);
+    frag.appendChild(petal);
   }
   container.appendChild(frag);
 }
@@ -766,6 +836,7 @@ class Bee {
    ================================================================ */
 const dayNight = new DayNightEngine();
 buildStars();
+buildPetals();
 
 const critters = [
   new Critter(document.getElementById('animalPig'), 5, 30),
