@@ -118,6 +118,17 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-
   background: radial-gradient(140px circle at var(--x, 50%) var(--y, 20%), rgba(130, 155, 255, 0.10), transparent 70%);
   transition: background-color 0.2s ease;
 }
+/* torchlight flicker — a faint nod to the theme-toggle torch, dark mode only */
+:root[data-theme="dark"] .cursor-glow { animation: torch-flicker 2.6s ease-in-out infinite; }
+@keyframes torch-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+  62% { opacity: 0.96; }
+  78% { opacity: 0.88; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="dark"] .cursor-glow { animation: none; }
+}
 
 /* header / nav */
 .site-header {
@@ -166,6 +177,7 @@ a:focus-visible, .btn:focus-visible { outline: 2px solid var(--grad-2); outline-
 }
 .theme-toggle:hover { border-color: var(--border-bright); background: var(--glass-hover); color: var(--text); }
 .theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .icon-moon { filter: drop-shadow(0 0 3px rgba(255, 184, 77, 0.65)); }
 .theme-toggle .icon-sun { display: none; }
 :root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
 :root[data-theme="light"] .theme-toggle .icon-sun { display: block; }
@@ -561,6 +573,55 @@ body.creative { --grad-1: #FF9D4D; --grad-2: #FF5C7A; }
 }
 @media (prefers-reduced-motion: reduce) {
   .lightbox, .lightbox-img { transition: none; }
+}
+
+/* achievement toasts */
+.achievement-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  pointer-events: none;
+}
+.achievement-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 230px;
+  max-width: 320px;
+  padding: 10px 16px 10px 10px;
+  background: rgba(18, 19, 26, 0.94);
+  border: 1px solid rgba(255, 209, 102, 0.35);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  transform: translateX(calc(100% + 24px));
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.22, 0.9, 0.32, 1.2), opacity 0.3s ease;
+}
+.achievement-toast.is-visible { transform: translateX(0); opacity: 1; }
+.achievement-toast-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, var(--grad-1), var(--grad-2));
+  color: #06070c;
+}
+.achievement-toast-icon svg { width: 19px; height: 19px; }
+.achievement-toast-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; color: #FFD166; font-weight: 700; margin: 0 0 2px; }
+.achievement-toast-text { font-size: 13.5px; color: #fff; font-weight: 600; margin: 0; font-family: var(--font-display); }
+@media (max-width: 640px) {
+  .achievement-toast-container { left: 16px; right: 16px; bottom: 16px; }
+  .achievement-toast { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .achievement-toast { transition: opacity 0.3s ease; transform: none; }
 }
 
 /* contact */

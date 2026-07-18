@@ -345,6 +345,87 @@ if (!reduceMotion && hasFinePointer) {
   }
 }
 
+// ---- Minecraft-style "Achievement Unlocked" toasts ----
+// Each achievement fires once ever (persisted in localStorage), mirroring how
+// Minecraft achievements can only be earned once per world.
+{
+  const ACHIEVEMENTS_KEY = 'portfolio-achievements';
+  let unlocked;
+  try { unlocked = JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY)) || {}; } catch (e) { unlocked = {}; }
+
+  const container = document.createElement('div');
+  container.className = 'achievement-toast-container';
+  container.setAttribute('aria-live', 'polite');
+  document.body.appendChild(container);
+
+  const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+
+  const unlock = (id, text) => {
+    if (unlocked[id]) return;
+    unlocked[id] = true;
+    try { localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(unlocked)); } catch (e) {}
+
+    const toast = document.createElement('div');
+    toast.className = 'achievement-toast';
+    toast.innerHTML = `
+      <span class="achievement-toast-icon">${checkIcon}</span>
+      <span>
+        <p class="achievement-toast-title">Achievement Unlocked</p>
+        <p class="achievement-toast-text">${text}</p>
+      </span>
+    `;
+    container.appendChild(toast);
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('is-visible')));
+    setTimeout(() => {
+      toast.classList.remove('is-visible');
+      setTimeout(() => toast.remove(), 500);
+    }, 3800);
+  };
+
+  document.addEventListener('themechange', () => {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') unlock('dark-mode', 'Embrace the Night');
+    else unlock('light-mode', 'Rise and Shine');
+  });
+
+  const lightboxEl = document.querySelector('.lightbox');
+  if (lightboxEl && 'MutationObserver' in window) {
+    const lbObserver = new MutationObserver(() => {
+      if (lightboxEl.classList.contains('is-open')) unlock('lightbox', 'Photo Enthusiast');
+    });
+    lbObserver.observe(lightboxEl, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  const footer = document.querySelector('.site-footer');
+  if (footer && 'IntersectionObserver' in window) {
+    const footerObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          unlock('full-tour', 'The Full Tour');
+          footerObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    footerObserver.observe(footer);
+  }
+
+  // Hidden: click the hero pill 5 times in quick succession.
+  const heroPill = document.querySelector('.hero-pill');
+  if (heroPill) {
+    let clicks = 0;
+    let resetTimer = null;
+    heroPill.addEventListener('click', () => {
+      clicks++;
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => { clicks = 0; }, 1200);
+      if (clicks >= 5) {
+        clicks = 0;
+        unlock('easter-egg', 'Diamonds! You Found the Secret');
+      }
+    });
+  }
+}
+
 // ---- hero name letter-in animation ----
 {
   const heroName = document.querySelector('.hero h1');
