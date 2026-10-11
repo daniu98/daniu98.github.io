@@ -184,7 +184,10 @@
     });
 
     function syncButtons() {
+      // When the gallery is pinned (desktop), the track does not scroll — the
+      // page does, and motion.js owns the buttons. Leave them enabled.
       var maxScroll = rail.scrollWidth - rail.clientWidth - 1;
+      if (maxScroll <= 0) { prev.disabled = next.disabled = false; return; }
       prev.disabled = rail.scrollLeft <= 0;
       next.disabled = rail.scrollLeft >= maxScroll;
     }
@@ -221,8 +224,25 @@
     });
   }
 
+  /* --- 9. Header is hidden during the opening ------------------------------
+     `html.intro` fades the header out and turns off its pointer events, so its
+     links must leave the tab order too — otherwise Tab lands focus on an
+     invisible, unclickable nav item. */
+  function initHeaderInert() {
+    var head = document.querySelector('.site-head');
+    if (!head) return;
+    var root = document.documentElement;
+    function sync() {
+      if (root.classList.contains('intro')) head.setAttribute('inert', '');
+      else head.removeAttribute('inert');
+    }
+    sync();
+    new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
+  }
+
   function init() {
     applyConfig();
+    initHeaderInert();
     setYear();
     initMenu();
     initProgress();

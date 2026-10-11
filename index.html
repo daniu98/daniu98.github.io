@@ -24,11 +24,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Newsreader:wght@400;500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="preload" as="image" href="assets/img/opt/profile-800.jpg" imagesrcset="assets/img/opt/profile-800.jpg 760w, assets/img/opt/profile-1600.jpg 1500w" imagesizes="(max-width: 1040px) 440px, 40vw">
-<script>document.documentElement.classList.add('js');</script>
+<script>
+  var de = document.documentElement;
+  de.classList.add('js');
+  /* The opening only owns the screen when you actually arrive at the top.
+     A deep link (#projects) or a restored scroll position skips it, and so
+     does coming back within the same tab — it plays once, not every time. */
+  var seen = false;
+  try { seen = sessionStorage.getItem('faceoff:seen') === '1'; } catch (e) {}
+  if (seen) de.classList.add('seen');
+  else if (!location.hash && window.scrollY < 10 &&
+      !matchMedia('(prefers-reduced-motion: reduce)').matches) de.classList.add('intro');
+</script>
 </head>
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
+
+<div id="ring" aria-hidden="true"></div>
+<div id="puck-track" aria-hidden="true"></div>
+<div id="puck-ind" aria-hidden="true">
+  <svg viewBox="-12 -12 24 24" fill="none">
+    <ellipse cx="0" cy="2.4" rx="9" ry="3.4" fill="#0a1a2b" opacity=".35"/>
+    <ellipse cx="0" cy="0" rx="9" ry="3.4" fill="#141b24" stroke="#56687c" stroke-width="1"/>
+  </svg>
+</div>
 
 <header class="site-head">
   <div class="wrap nav">
@@ -70,8 +90,35 @@
 <main id="main">
 <span id="top"></span>
 
-<!-- ============================ HERO ============================ -->
-<section class="hero" aria-labelledby="hero-name">
+<!-- ==================== THE OPENING: #rink =====================
+     A tall section with a sticky stage. assets/js/faceoff.js maps scroll
+     position inside it onto the sequence, then hands over to the hero.
+     Without JavaScript the stage collapses and the hero renders plainly. -->
+<div id="rink">
+<div class="stage">
+
+  <canvas id="ice" aria-hidden="true"></canvas>
+  <canvas id="shotfx" aria-hidden="true"></canvas>
+
+  <div class="sb" id="scoreboard" aria-hidden="true">
+    <div class="sb-top"><span class="sb-live">&#9679; LIVE</span><span>PERIOD 1</span></div>
+    <p class="sb-clock"><span id="sb-clock">16:40</span></p>
+    <div class="sb-foot"><span>PASSES <b id="sb-pass">00</b></span><span>XIAO <b>22</b></span></div>
+  </div>
+
+  <p class="faceoff-hint" id="faceoff-hint" aria-hidden="true">
+    <span class="mouse"><i></i></span>Scroll to drop the puck
+  </p>
+
+  <button class="faceoff-skip" id="faceoff-skip" type="button">Skip intro</button>
+
+  <div class="shot-call" id="shot-call" aria-hidden="true">
+    <span>Shot</span>
+    <em>Puck speed <b id="shot-radar">0</b> km/h</em>
+  </div>
+
+<section class="hero" id="hero" aria-labelledby="hero-name">
+  <canvas id="spray" aria-hidden="true"></canvas>
   <svg class="faceoff" viewBox="0 0 600 600" fill="none" aria-hidden="true" focusable="false">
     <circle cx="300" cy="300" r="258" stroke="currentColor" stroke-width="2"/>
     <circle cx="300" cy="300" r="15" stroke="currentColor" stroke-width="2"/>
@@ -86,7 +133,7 @@
         <span data-text="location">San Jose, CA</span> — UCLA
       </p>
 
-      <h1 class="hero-name" id="hero-name"><span>Daniel</span> <span>Xiao</span></h1>
+      <h1 class="hero-name" id="hero-name"><span><i>Daniel</i></span> <span><i>Xiao</i></span></h1>
 
       <p class="hero-lead">
         Computer Science student at UCLA building <b>backend systems</b>, <b>applied ML</b>
@@ -118,6 +165,10 @@
   </div>
 </section>
 
+</div>
+</div>
+<!-- ==================== end of the opening ==================== -->
+
 <!-- credential strip -->
 <div class="strip">
   <dl class="wrap strip-inner">
@@ -126,6 +177,12 @@
     <div class="strip-item"><dt>On the ice</dt><dd>10+ Years</dd></div>
     <div class="strip-item"><dt>Based in</dt><dd data-text="location">San Jose, CA</dd></div>
   </dl>
+</div>
+
+<div class="bands" aria-hidden="true">
+  <div class="band" data-dir="1">
+    <div class="band-track" data-words="FASTAPI|PYTORCH|MONGODB|C++|REACT|PLAYWRIGHT|AWS|EMBEDDED SYSTEMS|GRAPH ALGORITHMS|EDGE INFERENCE"></div>
+  </div>
 </div>
 
 <!-- ============================ 01 ABOUT ============================ -->
@@ -223,7 +280,7 @@
 
     <div class="board reveal">
       <div class="board-cell">
-        <p class="n">10+</p>
+        <p class="n" data-count="10+">10+</p>
         <p class="l">Years playing<br>organized hockey</p>
       </div>
       <div class="board-cell">
@@ -236,19 +293,26 @@
       </div>
     </div>
 
-    <div class="rail-head reveal">
-      <p class="label">From the rink — 6 frames</p>
-      <div class="rail-ctrls">
-        <button class="rail-btn" type="button" data-rail="prev" aria-label="Previous photos">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
-        <button class="rail-btn" type="button" data-rail="next" aria-label="More photos">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-        </button>
-      </div>
-    </div>
+  </div><!-- /wrap -->
 
-    <div class="rail" id="rail" tabindex="0" role="group" aria-label="Hockey photographs — scroll horizontally">
+  <!-- The gallery pans sideways as you scroll down. Below 860px the CSS
+       leaves it as an ordinary swipe rail. -->
+  <div class="pinned">
+    <div class="pin-stage">
+      <div class="pin-head">
+        <p class="label">From the rink — <span data-pin-idx>01</span> / 06</p>
+        <div class="rail-ctrls">
+          <div class="pin-bar" aria-hidden="true"><i></i></div>
+          <button class="rail-btn" type="button" data-rail="prev" aria-label="Previous photographs">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button class="rail-btn" type="button" data-rail="next" aria-label="More photographs">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pin-track" id="rail" tabindex="0" role="group" aria-label="Hockey photographs — scroll horizontally">
       <figure>
         <div class="shot"><img src="assets/img/opt/DSC09877-800.jpg" srcset="assets/img/opt/DSC09877-420.jpg 420w, assets/img/opt/DSC09877-800.jpg 760w, assets/img/opt/DSC09877-1600.jpg 1500w" sizes="(max-width: 560px) 74vw, 330px" width="1439" height="1800" loading="lazy" decoding="async" alt="Carrying the puck up ice in a blue and gold jersey"></div>
         <figcaption>Carrying out of the zone</figcaption>
@@ -275,7 +339,12 @@
       </figure>
     </div>
 
-    <figure class="band reveal" data-img="blueline">
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <figure class="band-photo reveal" data-img="blueline" data-plx="7">
       <img src="assets/img/opt/IMG_0213-800.jpg"
            srcset="assets/img/opt/IMG_0213-800.jpg 760w, assets/img/opt/IMG_0213-1600.jpg 1500w"
            sizes="100vw" width="1800" height="528" loading="lazy" decoding="async"
@@ -293,76 +362,148 @@
       <h2 class="h-sec" id="projects-h">Things I've <em>built</em></h2>
     </div>
 
-    <div class="proj-grid">
+    <div class="cases">
 
-      <article class="proj reveal">
-        <p class="proj-top"><span>Proj_01</span><span>2026</span></p>
-        <h3>Course Prerequisite API &amp; Data Pipeline</h3>
-        <p class="role">TreeReq — Project Lead, Backend &amp; AI</p>
-        <p>
-          A RESTful API built on FastAPI and MongoDB that serves UCLA course and prerequisite data
-          to a React frontend, fed by a Playwright and Claude API scraping pipeline that turns
-          unstructured prerequisite text into structured JSON across all 141 UCLA majors.
-        </p>
-        <div class="tags">
-          <span class="tag">FastAPI</span><span class="tag">MongoDB</span><span class="tag">React</span>
-          <span class="tag">Playwright</span><span class="tag">Claude API</span>
+      <!-- ---- 01 TreeReq ---- -->
+      <article class="case reveal">
+        <div class="case-demo">
+          <canvas data-demo="treereq" width="800" height="600" role="img"
+                  aria-label="Diagram of a course prerequisite graph: courses as nodes, prerequisites as arrows between them."></canvas>
+          <div class="demo-bar">
+            <button class="demo-btn" type="button" data-demo-act="scrape">Run the pipeline</button>
+            <span class="demo-read" data-demo-read>Hover a course to trace its chain</span>
+          </div>
         </div>
-        <p class="proj-links">
-          <a data-link="treereq" href="https://treereq.com" target="_blank" rel="noopener">Live site <span class="arw" aria-hidden="true">↗</span></a>
-          <a data-link="treereqSource" href="https://github.com/daniu98/treereq" target="_blank" rel="noopener">Source <span class="arw" aria-hidden="true">↗</span></a>
-        </p>
-      </article>
-
-      <article class="proj reveal">
-        <p class="proj-top"><span>Proj_02</span><span>2025 — 2026</span></p>
-        <h3>Autonomous Maze-Solving Robot</h3>
-        <p class="role">UCLA IEEE — Software Engineer</p>
-        <p>
-          A robot that navigates an unknown maze and finds the exit with no human input. Depth-first
-          search and graph traversal running over IR sensor reads and motor control, on a custom PCB
-          I designed and soldered through several hardware revisions.
-        </p>
-        <div class="tags">
-          <span class="tag">C++</span><span class="tag">Embedded</span><span class="tag">DFS</span>
-          <span class="tag">PCB Design</span><span class="tag">IR Sensors</span>
-        </div>
-        <p class="proj-links">
-          <a href="#work">Read the role <span class="arw" aria-hidden="true">→</span></a>
-        </p>
-      </article>
-
-      <article class="proj reveal">
-        <p class="proj-top"><span>Proj_03</span><span>Sept — Dec 2025</span></p>
-        <h3>Autonomous Rover</h3>
-        <p class="role">Personal project</p>
-        <p>
-          An Arduino and Java navigation system that pathfinds and avoids obstacles in real time,
-          fusing gyroscope and distance-sensor input in a closed sensor-motor feedback loop. The
-          chassis is a custom Fusion 360 design built around where the sensors needed to sit.
-        </p>
-        <div class="tags">
-          <span class="tag">Java</span><span class="tag">Arduino</span><span class="tag">Fusion 360</span>
-          <span class="tag">Sensor Fusion</span>
+        <div class="case-body">
+          <p class="case-top"><span>Proj_01</span><span>2026</span></p>
+          <h3>Course Prerequisite API &amp; Data Pipeline</h3>
+          <p class="role">TreeReq — Project Lead, Backend &amp; AI</p>
+          <p class="problem">
+            UCLA publishes prerequisites as prose, and 141 departments each write it their own
+            way. A student who wants to know what a course unlocks has to read the catalogue
+            and hold the graph in their head.
+          </p>
+          <p class="build">
+            I architected a RESTful API on FastAPI and MongoDB that serves course and
+            prerequisite data to a React frontend, and built the pipeline that feeds it:
+            Playwright and Chromium walk the catalogue, and the Claude API turns the
+            prerequisite sentences into structured JSON the API can actually traverse.
+            Nine engineers worked on the platform around it.
+          </p>
+          <div class="tags">
+            <span class="tag">FastAPI</span><span class="tag">MongoDB</span><span class="tag">React</span>
+            <span class="tag">Playwright</span><span class="tag">Claude API</span>
+          </div>
+          <p class="proj-links">
+            <a data-link="treereq" href="https://treereq.com" target="_blank" rel="noopener">Live site <span class="arw" aria-hidden="true">↗</span></a>
+            <a data-link="treereqSource" href="https://github.com/daniu98/treereq" target="_blank" rel="noopener">Source <span class="arw" aria-hidden="true">↗</span></a>
+          </p>
         </div>
       </article>
 
-      <article class="proj reveal">
-        <p class="proj-top"><span>Proj_04</span><span>Sept — Dec 2025</span></p>
-        <h3>MNIST Digit Classification</h3>
-        <p class="role">Personal project</p>
-        <p>
-          A convolutional neural network in PyTorch reaching 98%+ accuracy on MNIST. I built several
-          architectures with different convolutional and pooling depths to see where the tradeoff
-          between accuracy, training time and overfitting actually lands.
-        </p>
-        <div class="tags">
-          <span class="tag">Python</span><span class="tag">PyTorch</span><span class="tag">NumPy</span>
-          <span class="tag">Matplotlib</span>
+      <!-- ---- 02 Maze robot ---- -->
+      <article class="case reveal">
+        <div class="case-demo">
+          <canvas data-demo="maze" width="800" height="600" role="img"
+                  aria-label="Animation of a robot solving a maze by depth-first search, backtracking out of dead ends."></canvas>
+          <div class="demo-bar">
+            <button class="demo-btn" type="button" data-demo-act="run">Run the search</button>
+            <button class="demo-btn" type="button" data-demo-act="new">New maze</button>
+            <span class="demo-read" data-demo-read>Depth-first · backtracks on dead ends</span>
+          </div>
         </div>
-        <p class="proj-links">
-          <a data-link="mnistNotebook" href="https://colab.research.google.com/drive/1HHswCzuCuXArwtf1NBRv7ikT0AHCt6qm?usp=sharing" target="_blank" rel="noopener">Notebook <span class="arw" aria-hidden="true">↗</span></a>
-        </p>
+        <div class="case-body">
+          <p class="case-top"><span>Proj_02</span><span>2025 — 2026</span></p>
+          <h3>Autonomous Maze-Solving Robot</h3>
+          <p class="role">UCLA IEEE — Software Engineer</p>
+          <p class="problem">
+            Put a robot in a maze it has never seen, give it no map and no human input, and
+            have it find the exit. All it knows is what two IR sensors can see from where it
+            is standing.
+          </p>
+          <p class="build">
+            Depth-first search over a graph the robot builds as it drives: sense the open
+            walls, commit to an unvisited branch, and unwind the stack when the branch dies.
+            The hard part was below the algorithm — I designed and soldered the custom PCB for
+            motor control and sensor integration, through several hardware revisions before
+            the readings were stable enough to trust.
+          </p>
+          <div class="tags">
+            <span class="tag">C++</span><span class="tag">Embedded</span><span class="tag">DFS</span>
+            <span class="tag">PCB Design</span><span class="tag">IR Sensors</span>
+          </div>
+          <p class="proj-links">
+            <a href="#work">Read the role <span class="arw" aria-hidden="true">→</span></a>
+          </p>
+        </div>
+      </article>
+
+      <!-- ---- 03 Rover ---- -->
+      <article class="case reveal">
+        <div class="case-demo">
+          <canvas data-demo="rover" width="800" height="600" role="img"
+                  aria-label="Animation of a rover sweeping a distance sensor and steering around obstacles."></canvas>
+          <div class="demo-bar">
+            <button class="demo-btn" type="button" data-demo-act="obst">Move the obstacles</button>
+            <span class="demo-read" data-demo-read>Heading —°</span>
+          </div>
+        </div>
+        <div class="case-body">
+          <p class="case-top"><span>Proj_03</span><span>Sept — Dec 2025</span></p>
+          <h3>Autonomous Rover</h3>
+          <p class="role">Personal project</p>
+          <p class="problem">
+            I wanted to understand sensor fusion by building something that fails visibly when
+            you get it wrong: a rover that has to pathfind and dodge obstacles in real time,
+            where a bad heading estimate drives it into a wall.
+          </p>
+          <p class="build">
+            An Arduino and Java navigation system that fuses gyroscope and distance-sensor
+            input in a closed sensor-motor feedback loop. The chassis is a custom Fusion 360
+            design, laid out around where the sensors needed to sit rather than the other way
+            round.
+          </p>
+          <div class="tags">
+            <span class="tag">Java</span><span class="tag">Arduino</span><span class="tag">Fusion 360</span>
+            <span class="tag">Sensor Fusion</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 04 MNIST ---- -->
+      <article class="case reveal">
+        <div class="case-demo">
+          <canvas data-demo="mnist" width="800" height="600"
+                  aria-label="Draw a digit; the panel beside it shows real convolution kernels applied to your drawing."></canvas>
+          <div class="demo-bar">
+            <button class="demo-btn" type="button" data-demo-act="clear">Clear</button>
+            <span class="demo-read" data-demo-read>Draw in the box — the kernels run on what you draw</span>
+          </div>
+        </div>
+        <div class="case-body">
+          <p class="case-top"><span>Proj_04</span><span>Sept — Dec 2025</span></p>
+          <h3>MNIST Digit Classification</h3>
+          <p class="role">Personal project</p>
+          <p class="problem">
+            Everyone&rsquo;s first CNN hits 98% on MNIST. I wanted to know where the tradeoff
+            between accuracy, training time and overfitting actually lands, which means
+            building more than one of them.
+          </p>
+          <p class="build">
+            A convolutional network in PyTorch reaching 98%+ accuracy, then several variants
+            with different convolutional and pooling depths to see what each one buys. The
+            panel on the left runs three real convolution kernels over whatever you draw —
+            the same edge and blur responses a first conv layer learns. The trained model
+            itself lives in the notebook.
+          </p>
+          <div class="tags">
+            <span class="tag">Python</span><span class="tag">PyTorch</span><span class="tag">NumPy</span>
+            <span class="tag">Matplotlib</span>
+          </div>
+          <p class="proj-links">
+            <a data-link="mnistNotebook" href="https://colab.research.google.com/drive/1HHswCzuCuXArwtf1NBRv7ikT0AHCt6qm?usp=sharing" target="_blank" rel="noopener">Notebook <span class="arw" aria-hidden="true">↗</span></a>
+          </p>
+        </div>
       </article>
 
     </div>
@@ -553,19 +694,19 @@
     </p>
 
     <div class="contact-meta reveal">
-      <a data-link="email" href="mailto:daniu9807@g.ucla.edu">
+      <a data-magnet data-link="email" href="mailto:daniu9807@g.ucla.edu">
         <p class="k">Email</p>
         <p class="v"><span data-text="email">daniu9807@g.ucla.edu</span> <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-link="github" href="https://github.com/daniu98" target="_blank" rel="noopener">
+      <a data-magnet data-link="github" href="https://github.com/daniu98" target="_blank" rel="noopener">
         <p class="k">GitHub</p>
         <p class="v">@daniu98 <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-link="linkedin" href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">
+      <a data-magnet data-link="linkedin" href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">
         <p class="k">LinkedIn</p>
         <p class="v">in/daniel-xiao <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">
+      <a data-magnet data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">
         <p class="k">Résumé</p>
         <p class="v">PDF <span class="arw" aria-hidden="true">↗</span></p>
       </a>
@@ -585,5 +726,8 @@
 
 <script src="assets/js/site-config.js"></script>
 <script src="assets/js/site.js"></script>
+<script src="assets/js/motion.js"></script>
+<script src="assets/js/faceoff.js"></script>
+<script src="assets/js/demos.js"></script>
 </body>
 </html>
