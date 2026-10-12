@@ -94,13 +94,28 @@
     var byId = {};
     NODES.forEach(function (n) { byId[n.id] = n; });
 
-    var run = 1, running = false, hover = null, chain = {}, t0 = 0;
+    var run = RM ? 0 : 1, running = false, hover = null, up = {}, down = {}, t0 = 0;
+
+    /* With no animation to watch, the control steps the pipeline instead. */
+    if (RM && bar) {
+      var stepBtn = bar.querySelector('[data-demo-act="scrape"]');
+      if (stepBtn) stepBtn.textContent = 'Step the pipeline';
+    }
 
     /* every course this one depends on, transitively */
     function ancestors(id, out) {
       out = out || {};
       EDGES.forEach(function (e) {
         if (e[1] === id && !out[e[0]]) { out[e[0]] = true; ancestors(e[0], out); }
+      });
+      return out;
+    }
+
+    /* and everything it unlocks, which is the question the case study asks */
+    function descendants(id, out) {
+      out = out || {};
+      EDGES.forEach(function (e) {
+        if (e[0] === id && !out[e[1]]) { out[e[1]] = true; descendants(e[1], out); }
       });
       return out;
     }
@@ -156,8 +171,8 @@
       }
 
       label(ctx, sx0, h * 0.25,
-            running ? 'PARSING PREREQUISITE TEXT…' : 'PREREQUISITES PARSED · 141 MAJORS',
-            9, running ? C.muted : C.mint);
+            p < 0.999 ? 'PARSING PREREQUISITE TEXT…' : 'PREREQUISITES PARSED · 141 MAJORS',
+            9, p < 0.999 ? C.muted : C.mint);
 
       /* ---- the graph ---- */
       var reveal = running ? clamp((p - 0.3) / 0.6, 0, 1) : 1;
@@ -166,33 +181,46 @@
       EDGES.forEach(function (e) {
         var a = byId[e[0]], b = byId[e[1]];
         if (NODES.indexOf(a) >= shown || NODES.indexOf(b) >= shown) return;
-        var lit = hover && (chain[e[0]] || e[0] === hover) && (chain[e[1]] || e[1] === hover);
+        var isUp   = hover && (up[e[0]]   || e[0] === hover) && (up[e[1]]   || e[1] === hover);
+        var isDown = hover && (down[e[1]] || e[1] === hover) && (down[e[0]] || e[0] === hover);
+        var lit = isUp || isDown;
+        var col = isUp ? C.blue : isDown ? C.red : C.line;
         var ax = a.x + L.nw, ay = a.y + L.nh / 2, bx = b.x, by = b.y + L.nh / 2;
         ctx.beginPath();
         ctx.moveTo(ax, ay);
         ctx.bezierCurveTo(ax + (bx - ax) * 0.5, ay, ax + (bx - ax) * 0.5, by, bx - 5, by);
-        ctx.strokeStyle = lit ? C.red : C.line;
+        ctx.strokeStyle = col;
         ctx.lineWidth = lit ? 1.8 : 1.1;
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(bx, by); ctx.lineTo(bx - 5.5, by - 3.2); ctx.lineTo(bx - 5.5, by + 3.2);
         ctx.closePath();
-        ctx.fillStyle = lit ? C.red : C.line; ctx.fill();
+        ctx.fillStyle = col; ctx.fill();
       });
+
+      if (hover) {
+        var lx = L.padX || Math.max(14, w * 0.05), ly = h * 0.305;
+        ctx.fillStyle = C.blue; ctx.fillRect(lx, ly - 3, 10, 2);
+        label(ctx, lx + 15, ly, 'REQUIRED', 8, C.blue);
+        ctx.fillStyle = C.red; ctx.fillRect(lx + 76, ly - 3, 10, 2);
+        label(ctx, lx + 91, ly, 'UNLOCKED', 8, C.red);
+      }
 
       NODES.forEach(function (n, i) {
         if (i >= shown) return;
         var isHover = n.id === hover;
-        var lit = hover && (isHover || chain[n.id]);
+        var isUp = !isHover && up[n.id], isDown = !isHover && down[n.id];
+        var lit = hover && (isHover || isUp || isDown);
+        var tone = isUp ? C.blue : isDown ? C.red : null;
         ctx.globalAlpha = (hover && !lit) ? 0.4 : 1;
         roundRect(ctx, n.x, n.y, L.nw, L.nh, 3);
-        ctx.fillStyle = isHover ? C.navy : lit ? '#fdeaee' : C.paper;
+        ctx.fillStyle = isHover ? C.navy : isUp ? '#eef3fb' : isDown ? '#fdeaee' : C.paper;
         ctx.fill();
-        ctx.strokeStyle = lit ? C.red : C.line;
+        ctx.strokeStyle = tone || (isHover ? C.navy : C.line);
         ctx.lineWidth = lit ? 1.5 : 1;
         ctx.stroke();
         label(ctx, n.x + L.nw / 2, n.y + L.nh / 2, n.id, 9.5,
-              isHover ? '#fff' : lit ? C.red : C.steel, 'center');
+              isHover ? '#fff' : tone || C.steel, 'center');
         ctx.globalAlpha = 1;
       });
 
@@ -208,11 +236,13 @@
       });
       if (found === hover) return;
       hover = found;
-      chain = found ? ancestors(found) : {};
-      var k = Object.keys(chain).length;
-      setRead(bar, found
-        ? found + ' — ' + k + ' prerequisite' + (k === 1 ? '' : 's') + ' upstream'
-        : IDLE);
+      up   = found ? ancestors(found)   : {};
+      down = found ? descendants(found) : {};
+      var nu = Object.keys(up).length, nd = Object.keys(down).length;
+      setRead(bar, !found ? IDLE
+        : (nu || nd)
+          ? found + ' — ' + nu + ' required upstream · ' + nd + ' unlocked downstream'
+          : found + ' — no prerequisites, nothing downstream');
       draw(performance.now());
     }
 
@@ -221,12 +251,12 @@
     var HOVERS = window.matchMedia('(hover: hover)').matches;
     var IDLE = HOVERS ? 'Hover a course to trace its chain'
                       : 'Tap a course to trace its chain';
-    if (!RM) {
+    {
       setRead(bar, IDLE);
       if (HOVERS) {
         cv.addEventListener('pointermove', hitTest);
         cv.addEventListener('pointerleave', function () {
-          hover = null; chain = {};
+          hover = null; up = {}; down = {};
           setRead(bar, IDLE);
           draw(performance.now());
         });
@@ -235,7 +265,7 @@
           var before = hover;
           hitTest(e);
           if (hover === before && hover) {        /* tap the same node to clear */
-            hover = null; chain = {};
+            hover = null; up = {}; down = {};
             setRead(bar, IDLE);
             draw(performance.now());
           }
@@ -246,7 +276,19 @@
     return {
       draw: draw,
       act: function (what) {
-        if (what === 'scrape' && !RM) { running = true; t0 = performance.now(); return true; }
+        if (what !== 'scrape') return;
+        /* Reduced motion advances one stage per press and wraps, so the control
+           does real, visible work without anything moving on its own. */
+        if (RM) {
+          var n = STAGES.length - 1;
+          run = run >= 0.999 ? 0 : Math.min(1, run + 1 / n);
+          var i = Math.round(run * n);
+          setRead(bar, run >= 0.999
+            ? 'Parsed — ' + STAGES.length + ' stages, 141 majors'
+            : 'Stage ' + (i + 1) + ' of ' + STAGES.length + ' — ' + STAGES[i]);
+          return false;
+        }
+        running = true; t0 = performance.now(); return true;
       }
     };
   }
@@ -408,12 +450,17 @@
       return !done;
     }
 
+    /* Reduced motion still gets a real search — just the answer rather than
+       the animation. Capped so a pathological maze cannot spin. */
+    function runToEnd() {
+      for (var i = 0; i < CW * CH * 8 && !done; i++) step();
+    }
+
     return {
       draw: draw,
       act: function (what) {
-        if (RM) return false;
-        if (what === 'new') { build(); return true; }
-        if (what === 'run') { reset(); return true; }
+        if (what === 'new') { build(); return !RM; }
+        if (what === 'run') { reset(); if (RM) runToEnd(); return !RM; }
       },
       onEnter: function () { if (!RM && done) reset(); }
     };
@@ -565,7 +612,26 @@
       return !RM;
     }
 
-    return { draw: draw, act: function (w) { if (w === 'obst') { seed(); return !RM; } } };
+    /* Reduced motion gets the whole run resolved in one frame: the route the
+       planner actually took across the new field, not a stopped rover with a
+       stale sensor readout. Stops short of the goal so tick()'s own arrival
+       reseed cannot wipe the trail we are about to draw. */
+    function runToEnd() {
+      for (var i = 0; i < 1600; i++) {
+        if (Math.hypot(goal.x - r.x, goal.y - r.y) < 0.075) break;
+        tick();
+      }
+    }
+
+    return {
+      draw: draw,
+      act: function (w) {
+        if (w !== 'obst') return;
+        seed();
+        if (RM) { runToEnd(); return false; }
+        return true;
+      }
+    };
   }
 
   /* =======================================================================
@@ -771,7 +837,11 @@
         var btn = e.target.closest('[data-demo-act]');
         if (!btn) return;
         var keep = demo.act && demo.act(btn.getAttribute('data-demo-act'));
+        /* Under reduced motion act() does its work synchronously and returns
+           false. Without this frame the state changed and nothing repainted —
+           which is what made every button here look dead. */
         if (keep) kick();
+        else demo.draw(performance.now());
       });
     }
 
