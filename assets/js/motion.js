@@ -1,3 +1,14 @@
+/* NOT LOADED.
+
+   This held the ambient scroll motion — word-by-word headings, odometer
+   digits, marquee bands, the puck scroll indicator, page tint drift,
+   parallax, stacking experience rows, the cursor ring, magnetic links and the
+   pinned photo gallery. The page was deliberately quietened down and no longer
+   includes this file; index.html does not reference it.
+
+   Kept in the repo so individual effects can be lifted back out if wanted.
+   Deleting it changes nothing. */
+
 /* ===========================================================================
    Motion — the behaviour shared by every section.
 

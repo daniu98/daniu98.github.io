@@ -1379,11 +1379,11 @@ html:not(.js) #ring { display: none; }
 
 /* Reduced motion: no stage, no sequence — just the hero. */
 html.rm #rink,
-html.seen #rink { height: auto; background: var(--ice); }
+html.folded #rink { height: auto; background: var(--ice); }
 html.rm #rink .stage,
-html.seen #rink .stage { position: static; height: auto; overflow: visible; }
+html.folded #rink .stage { position: static; height: auto; overflow: visible; }
 html.rm #rink .hero,
-html.seen #rink .hero,
+html.folded #rink .hero,
 html:not(.js) #rink .hero { position: relative; inset: auto; opacity: 1; visibility: visible; padding-top: clamp(104px, 13vh, 150px); }
 html.rm #ice, html.rm #shotfx, html.rm #spray, html.rm .sb,
 html.rm .faceoff-hint, html.rm .faceoff-skip, html.rm .shot-call { display: none; }
@@ -1631,25 +1631,21 @@ body.hovering #ring {
 /* ---------- 15j. Pinned photo rail ---------------------------------------- */
 
 .pinned { position: relative; }
-.pinned .pin-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  padding-top: var(--head-h);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-}
+.pinned .pin-stage { position: static; height: auto; }
+/* An ordinary horizontal rail at every width. It used to pin and turn vertical
+   scroll into a horizontal pan; that took over the page's scrolling, which is
+   the one interaction worth leaving alone. */
 .pin-track {
   display: flex;
   gap: clamp(14px, 1.6vw, 26px);
   padding-inline: var(--gut);
-  width: max-content;
-  will-change: transform;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
-.pin-track figure { flex: 0 0 clamp(250px, 27vw, 400px); margin: 0; }
+.pin-track::-webkit-scrollbar { display: none; }
+.pin-track figure { flex: 0 0 clamp(250px, 27vw, 400px); margin: 0; scroll-snap-align: start; }
 .pin-track .shot {
   overflow: hidden;
   background: var(--navy-2);
@@ -1659,11 +1655,9 @@ body.hovering #ring {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  transform: scale(1.04) rotate(var(--sk, 0deg));
-  transition: transform 1s var(--ease-out), filter var(--t-med) var(--ease-out);
-  filter: saturate(.92);
+  transition: transform .5s var(--ease-out);
 }
-.pin-track figure:hover img { transform: scale(1.1); filter: saturate(1.05); }
+.pin-track figure:hover img { transform: scale(1.04); }
 .pin-track figcaption {
   margin-top: 11px;
   font-family: var(--mono);
@@ -1712,16 +1706,7 @@ body.hovering #ring {
   .sb { min-width: 168px; }
   .sb-clock { font-size: 31px; }
   #puck-ind, #puck-track { display: none; }
-  .pinned .pin-stage { position: static; height: auto; }
-  .pin-track {
-    width: auto;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    transform: none !important;
-  }
-  .pin-track figure { flex-basis: 74vw; scroll-snap-align: start; }
-  .pin-track::-webkit-scrollbar { display: none; }
+  .pin-track figure { flex-basis: 74vw; }
 }
 
 @media (max-width: 680px) {
@@ -1866,6 +1851,32 @@ html[data-kit="away"] .sec--dark { --kit: #8fc0f2; }
   border-left: 2px solid var(--kit);
   padding-left: 12px;
 }
+
+/* ---------- 15y. "Watch the opening" --------------------------------------
+   Deliberately quiet: the page's job is the work, and the rink sequence is an
+   aside for anyone who wants it. Hidden entirely without JavaScript and under
+   reduced motion, because there would be nothing to play. */
+
+.play-opening {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: clamp(20px, 2.4vw, 30px);
+  padding: 6px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.play-opening .po-icon { font-size: 8px; color: var(--kit); transition: transform .25s var(--ease); }
+.play-opening:hover { color: var(--navy); border-color: var(--kit); }
+.play-opening:hover .po-icon { transform: translateX(2px); }
+.play-opening[hidden] { display: none; }
 
 /* ---------- 16b. Touch targets ---------------------------------------------
    Everything clears the WCAG 2.2 minimum at any size, but on a coarse pointer

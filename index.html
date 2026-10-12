@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daniel Xiao — Software Engineer</title>
-<meta name="description" content="Daniel Xiao — Computer Science student at UCLA building backend systems, applied ML and autonomous robots. Ten years on the ice.">
+<meta name="description" content="Daniel Xiao — Computer Science student at UCLA working on backend systems, applied ML and the embedded end of robotics. AWS infrastructure at Bumblebee Networks, a prerequisite API across 141 UCLA majors, and edge ML research at Purdue.">
 <meta name="author" content="Daniel Xiao">
 <meta name="theme-color" content="#f4f6f8">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Daniel Xiao — Software Engineer">
-<meta property="og:description" content="Computer Science student at UCLA building backend systems, applied ML and autonomous robots. Ten years on the ice.">
+<meta property="og:description" content="Computer Science student at UCLA working on backend systems, applied ML and the embedded end of robotics.">
 <meta property="og:image" content="assets/img/opt/profile-1600.jpg">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -32,25 +32,15 @@
      does coming back within the same tab — it plays once, not every time. */
   try { de.dataset.kit = localStorage.getItem('kit') === 'away' ? 'away' : 'home'; }
   catch (e) { de.dataset.kit = 'home'; }
-  var seen = false;
-  try { seen = sessionStorage.getItem('faceoff:seen') === '1'; } catch (e) {}
-  if (seen) de.classList.add('seen');
-  else if (!location.hash && window.scrollY < 10 &&
-      !matchMedia('(prefers-reduced-motion: reduce)').matches) de.classList.add('intro');
+  /* The page opens on the hero. The rink sequence is folded away until someone
+     asks for it from the link in the hero. */
+  de.classList.add('folded');
 </script>
 </head>
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
 
-<div id="ring" aria-hidden="true"></div>
-<div id="puck-track" aria-hidden="true"></div>
-<div id="puck-ind" aria-hidden="true">
-  <svg viewBox="-12 -12 24 24" fill="none">
-    <ellipse cx="0" cy="2.4" rx="9" ry="3.4" fill="#0a1a2b" opacity=".35"/>
-    <ellipse cx="0" cy="0" rx="9" ry="3.4" fill="#141b24" stroke="#56687c" stroke-width="1"/>
-  </svg>
-</div>
 
 <header class="site-head">
   <div class="wrap nav">
@@ -138,9 +128,10 @@
       <h1 class="hero-name" id="hero-name"><span><i>Daniel</i></span> <span><i>Xiao</i></span></h1>
 
       <p class="hero-lead">
-        Computer Science student at UCLA building <b>backend systems</b>, <b>applied ML</b>
-        and <b>autonomous robots</b>. Ten years of hockey taught me the rest — read the play,
-        take the shift in front of you, leave the team better than you found it.
+        Computer Science student at UCLA, working on <b>backend systems</b>, <b>applied ML</b>
+        and the <b>embedded</b> end of robotics. Lately that means document transfer
+        infrastructure on AWS, a prerequisite API that reads catalogue prose written by 141
+        different majors, and a 5,000-parameter model deciding a UAV's next move in 3.04 ms.
       </p>
 
       <div class="hero-actions">
@@ -149,6 +140,10 @@
         <a class="btn btn--ghost" data-link="linkedin" href="https://linkedin.com/in/daniel-xiao-9b56613bb" target="_blank" rel="noopener">LinkedIn <span class="arw" aria-hidden="true">↗</span></a>
         <a class="btn btn--ghost" data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">Résumé <span class="arw" aria-hidden="true">↗</span></a>
       </div>
+
+      <button type="button" class="play-opening" id="play-opening" hidden>
+        <span class="po-icon" aria-hidden="true">▶</span>Watch the opening
+      </button>
     </div>
 
     <figure class="hero-figure" data-img="hero">
@@ -179,45 +174,48 @@
   <dl class="wrap strip-inner">
     <div class="strip-item"><dt>Studying</dt><dd>B.S. Computer Science</dd></div>
     <div class="strip-item"><dt>Focus</dt><dd>Backend &amp; Applied ML</dd></div>
-    <div class="strip-item"><dt>On the ice</dt><dd>10+ Years</dd></div>
+    <div class="strip-item"><dt>Most recently</dt><dd>SWE Intern, Bumblebee Networks</dd></div>
     <div class="strip-item"><dt>Based in</dt><dd data-text="location">San Jose, CA</dd></div>
   </dl>
 </div>
 
-<div class="bands" aria-hidden="true">
-  <div class="band" data-dir="1">
-    <div class="band-track" data-words="FASTAPI|PYTORCH|MONGODB|C++|REACT|PLAYWRIGHT|AWS|EMBEDDED SYSTEMS|GRAPH ALGORITHMS|EDGE INFERENCE"></div>
-  </div>
-</div>
 
 <!-- ============================ 01 ABOUT ============================ -->
 <section class="sec" id="about" aria-labelledby="about-h">
   <div class="wrap">
     <div class="sec-head reveal">
       <p class="eyebrow"><span class="num">01</span><span class="bar" aria-hidden="true"></span>About</p>
-      <h2 class="h-sec" id="about-h">How I <em>play</em></h2>
+      <h2 class="h-sec" id="about-h">Real <em>conditions</em></h2>
     </div>
 
     <div class="about-grid">
       <div class="about-prose lead reveal">
         <p>
-          I like problems where the answer has to survive contact with the real world. A model that
-          has to make a call in three milliseconds on a drone. An API that has to make sense of
-          prerequisite text written by 141 different departments. A robot that has to find its own
-          way out of a maze with nothing but two IR sensors and whatever I wrote the night before.
+          I like problems where the answer has to survive contact with something other than a
+          test set. A UAV model that has to make the call in three milliseconds. An API that has
+          to make sense of prerequisite text written by 141 different majors, none of them to a
+          spec. A robot that has to find its own way out of a maze with nothing but two IR
+          sensors and whatever I wrote the night before.
         </p>
         <p>
-          Hockey is where I learned how to work. Ten years of it — early ice, positional reads,
-          trusting four other people to be exactly where they said they would be. The habits carry
-          over more than people expect: see the whole sheet before you move, say the thing early,
-          and when the shift is ugly, finish it anyway.
+          The interesting part is almost never the algorithm. Depth-first search through a maze
+          is a classroom exercise; what took months was the custom PCB, soldered by hand through
+          several revisions, before the IR readings were steady enough to act on. The UAV
+          controller needed 9,920 epochs of tuning to hold 27 cm of mean error — and its 3.04 ms
+          inference time counted for just as much, because on an edge device an answer that
+          arrives late is a wrong one.
         </p>
         <p>
-          Lately that looks like document transfer infrastructure on AWS, a course-planning backend
-          for UCLA students, and two years of research on low-latency models small enough to run on
-          the edge. I'm happiest somewhere between the systems and the people who have to use them.
+          Right now that looks like document transfer and storage on AWS at Bumblebee Networks,
+          moving diagnostic logs and support-ticket data between branch devices and the cloud,
+          plus the monitoring, failover and threat-detection work that keeps those branches
+          reachable with nobody on site. Before that, two years at Purdue on models small enough
+          to run on the edge, and leading nine engineers on TreeReq, where being clear mattered
+          more than being clever. The work I keep coming back to is infrastructure: the layer
+          other people's work sits on, where a bad decision stays quiet for a long time and then
+          isn't.
         </p>
-        <p class="pull">Read the play. Take the shift. Leave the team better.</p>
+        <p class="pull">Right too late is still wrong.</p>
       </div>
 
       <dl class="facts reveal">
@@ -612,8 +610,8 @@
 <section class="sec" id="beyond" aria-labelledby="beyond-h">
   <div class="wrap">
     <div class="sec-head reveal">
-      <p class="eyebrow"><span class="num">05</span><span class="bar" aria-hidden="true"></span>Beyond the rink</p>
-      <h2 class="h-sec" id="beyond-h">Off the <em>clock</em></h2>
+      <p class="eyebrow"><span class="num">05</span><span class="bar" aria-hidden="true"></span>Away from the desk</p>
+      <h2 class="h-sec" id="beyond-h">Other <em>hours</em></h2>
     </div>
 
     <div class="beyond-grid">
@@ -691,28 +689,28 @@
   <div class="wrap">
     <p class="eyebrow reveal"><span class="num">06</span><span class="bar" aria-hidden="true"></span>Contact</p>
     <h2 class="contact-cta reveal" id="contact-h">
-      <a data-link="email" href="mailto:daniu9807@g.ucla.edu">Drop the <em>puck.</em></a>
+      <a data-link="email" href="mailto:daniu9807@g.ucla.edu">Send a <em>note.</em></a>
     </h2>
     <p class="lead reveal" style="margin-top:clamp(22px,2.6vw,34px)">
-      I'm looking for software engineering internships in backend, infrastructure and applied ML —
-      and I'm always up for talking about distributed systems, small models, or anyone's beer-league
-      power play.
+      I'm looking for software engineering internships in backend, infrastructure and applied ML.
+      If you're building something with a real constraint in it — latency, scale, hardware you can
+      hold in your hand — I'd like to hear about it.
     </p>
 
     <div class="contact-meta reveal">
-      <a data-magnet data-link="email" href="mailto:daniu9807@g.ucla.edu">
+      <a data-link="email" href="mailto:daniu9807@g.ucla.edu">
         <p class="k">Email</p>
         <p class="v"><span data-text="email">daniu9807@g.ucla.edu</span> <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-magnet data-link="github" href="https://github.com/daniu98" target="_blank" rel="noopener">
+      <a data-link="github" href="https://github.com/daniu98" target="_blank" rel="noopener">
         <p class="k">GitHub</p>
         <p class="v">@daniu98 <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-magnet data-link="linkedin" href="https://linkedin.com/in/daniel-xiao-9b56613bb" target="_blank" rel="noopener">
+      <a data-link="linkedin" href="https://linkedin.com/in/daniel-xiao-9b56613bb" target="_blank" rel="noopener">
         <p class="k">LinkedIn</p>
         <p class="v">in/daniel-xiao <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-magnet data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">
+      <a data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">
         <p class="k">Résumé</p>
         <p class="v">PDF <span class="arw" aria-hidden="true">↗</span></p>
       </a>
@@ -732,7 +730,6 @@
 
 <script src="assets/js/site-config.js"></script>
 <script src="assets/js/site.js"></script>
-<script src="assets/js/motion.js"></script>
 <script src="assets/js/faceoff.js"></script>
 <script src="assets/js/demos.js"></script>
 </body>

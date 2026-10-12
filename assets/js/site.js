@@ -286,10 +286,25 @@
     });
   }
 
+  /* --- 11. The opening is opt-in -------------------------------------------
+     The page lands on the hero. This reveals the one way into the rink
+     sequence, and only when there is something to play: it stays hidden with
+     JavaScript off and for anyone who asked for reduced motion. */
+  function initOpening() {
+    var btn = document.getElementById('play-opening');
+    if (!btn || reduceMotion) return;
+    if (!document.getElementById('rink')) return;
+    btn.hidden = false;
+    btn.addEventListener('click', function () {
+      if (typeof window.playOpening === 'function') window.playOpening();
+    });
+  }
+
   function init() {
     applyConfig();
     initHeaderInert();
     initKit();
+    initOpening();
     setYear();
     initMenu();
     initProgress();

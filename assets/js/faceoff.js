@@ -696,25 +696,29 @@
     }
   }
 
-  /* Played once already in this tab. Scoped to the session so a visitor who
-     comes back tomorrow still gets the opening, but navigating away and back
-     drops them straight into the portfolio. */
-  function markSeen() {
-    try { sessionStorage.setItem('faceoff:seen', '1'); } catch (e) {}
+  /* The page lands on the hero. The opening is something a visitor can choose
+     to watch, not a corridor they have to walk down first — so by default the
+     stage is folded away and nothing here runs at all. */
+  function fold(on) {
+    root.classList.toggle('folded', on);
+    if (on) root.classList.remove('intro');
+    hero.classList.toggle('on', on);
+    hero.classList.toggle('settled', on);
+    if (board) board.classList.toggle('off', on);
+    [hint, skipBtn, ice, fx].forEach(function (el) {
+      if (el) el.style.display = on ? 'none' : '';
+    });
   }
 
-  /* ---- no sequence at all: reduced motion, or already seen this session --- */
-  if (RM || root.classList.contains('seen')) {
-    root.classList.add(RM ? 'rm' : 'seen');
-    root.classList.remove('intro');
-    hero.classList.add('on', 'settled');
-    if (board) board.classList.add('off');
-    if (hint) hint.style.display = 'none';
-    if (skipBtn) skipBtn.style.display = 'none';
-    if (ice) ice.style.display = 'none';
-    if (fx) fx.style.display = 'none';
+  /* Reduced motion never gets the sequence at all. */
+  if (RM) {
+    root.classList.add('rm');
+    fold(true);
     return;
   }
+
+  var armed = root.classList.contains('intro');
+  if (!armed) fold(true);
 
   /* ---- drive it ---------------------------------------------------------- */
   var sp = 0, raf = null, running = false, lastFilter = '', fxDirty = false, paintT = 0;
@@ -723,7 +727,6 @@
   function setHero(on) {
     if (on === heroOn) return;
     heroOn = on;
-    if (on) markSeen();
     hero.classList.toggle('on', on);
     cancelAnimationFrame(heroRaf);
     clearInterval(radarIv);
@@ -838,6 +841,7 @@
      the page (a #projects deep link) must still clear the intro state. */
   var io = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
+      if (!armed) { running = false; return; }
       running = e.isIntersecting;
       if (running && !paintT) paintT = performance.now();
       if (running && !raf) raf = requestAnimationFrame(frame);
@@ -849,11 +853,32 @@
   }, { threshold: 0 });
   io.observe(sec);
 
-  if (skipBtn) {
-    skipBtn.addEventListener('click', function () {
-      markSeen();
-      var y = sec.offsetTop + sec.offsetHeight - window.innerHeight * 0.1;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    });
+  /* Skip puts the page back the way it opened. */
+  function stop() {
+    armed = false;
+    running = false;
+    cancelAnimationFrame(raf); raf = null;
+    cancelAnimationFrame(heroRaf); clearInterval(radarIv);
+    sp = 0; paintT = 0; heroOn = false;
+    if (lastFilter) { ice.style.filter = ''; lastFilter = ''; }
+    fold(true);
+    if (heroIn) heroIn.style.transform = '';
+    if (sprayCv) sprayCv.style.transform = '';
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
+
+  if (skipBtn) skipBtn.addEventListener('click', stop);
+
+  /* The one way in: the "watch the opening" link in the hero. */
+  window.playOpening = function () {
+    if (armed) return;
+    armed = true;
+    fold(false);
+    root.classList.add('intro');
+    sp = 0; paintT = 0; heroOn = false;
+    size();
+    window.scrollTo({ top: sec.offsetTop, behavior: 'auto' });
+    running = true;
+    if (!raf) raf = requestAnimationFrame(frame);
+  };
 })();
