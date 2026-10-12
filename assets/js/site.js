@@ -240,9 +240,56 @@
     new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
   }
 
+  /* --- 10. Home / away sweater ---------------------------------------------
+     His two real numbers. The plate under the hero photo is the control; the
+     choice is remembered, and the inline script in <head> reads it back so
+     there is no flash of the wrong kit on load. faceoff.js listens for
+     `kitchange` and repaints the skater in the matching sweater. */
+  function initKit() {
+    var btn = document.getElementById('kit-toggle');
+    var cfg = (window.SITE || {}).kit;
+    if (!btn || !cfg) return;
+
+    var numEl   = document.getElementById('kit-number');
+    var sideEl  = document.getElementById('kit-side');
+    var sheetEl = document.getElementById('kit-sheet');
+    var sbNum   = document.getElementById('sb-num');
+    var noteEl  = document.getElementById('kit-note');
+    var root    = document.documentElement;
+
+    function apply(side, announce) {
+      var k = cfg[side] || cfg.home;
+      root.dataset.kit = side;
+      if (numEl)   numEl.textContent   = k.number;
+      if (sideEl)  sideEl.textContent  = k.label;
+      if (sheetEl) sheetEl.textContent = k.sheet;
+      if (sbNum)   sbNum.textContent   = k.number;
+      btn.setAttribute('aria-pressed', String(side === 'away'));
+      btn.setAttribute('aria-label',
+        'Jersey number ' + k.number + ', ' + k.label.toLowerCase() +
+        ' sweater. Activate to switch to the ' +
+        (side === 'away' ? cfg.home.label : cfg.away.label).toLowerCase() + ' sweater.');
+      if (noteEl) {
+        var note = (cfg.note || '').trim();
+        noteEl.textContent = note;
+        noteEl.hidden = !note;
+      }
+      if (announce) document.dispatchEvent(new CustomEvent('kitchange', { detail: side }));
+    }
+
+    apply(root.dataset.kit === 'away' ? 'away' : 'home', false);
+
+    btn.addEventListener('click', function () {
+      var next = root.dataset.kit === 'away' ? 'home' : 'away';
+      try { localStorage.setItem('kit', next); } catch (e) {}
+      apply(next, true);
+    });
+  }
+
   function init() {
     applyConfig();
     initHeaderInert();
+    initKit();
     setYear();
     initMenu();
     initProgress();

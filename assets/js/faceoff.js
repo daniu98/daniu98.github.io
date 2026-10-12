@@ -384,6 +384,167 @@
     ictx.restore();
   }
 
+
+  /* ---- the skater --------------------------------------------------------- */
+  /* Built joint by joint in metres off the ice and run through the same
+     pinhole projection as everything else, so he foreshortens correctly as he
+     closes on the camera instead of just scaling up. One stride phase drives
+     the legs and arms; `cut` is how hard he is leaning into a turn. */
+
+  /* His two sweaters, so the figure on the ice matches the number on the
+     scoreboard instead of contradicting it. */
+  var KITS = {
+    home: { body: '#eef3f7', sleeve: '#cfdbe6', trim: '#2a6ebb', pants: '#16233a', socks: '#2a6ebb' },
+    away: { body: '#e0ae45', sleeve: '#b9842c', trim: '#2a6ebb', pants: '#16233a', socks: '#2a6ebb' }
+  };
+  var KIT = KITS[root.dataset.kit === 'away' ? 'away' : 'home'];
+  document.addEventListener('kitchange', function (e) {
+    KIT = KITS[e.detail === 'away' ? 'away' : 'home'];
+  });
+
+  function limb(ctx, pts, w, col, cap) {
+    ctx.beginPath();
+    for (var i = 0; i < pts.length; i++) i ? ctx.lineTo(pts[i].x, pts[i].y) : ctx.moveTo(pts[i].x, pts[i].y);
+    ctx.lineWidth = Math.max(1, w);
+    ctx.strokeStyle = col;
+    ctx.lineCap = cap || 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  }
+
+  function skater(ctx, x, z, headX, phase, cut, puck) {
+    var q0 = P(x, 0, z), s = q0.s;
+    if (s <= 0 || q0.y < -H || q0.y > H * 2) return;
+
+    /* Metres -> a point, at this skater's depth. */
+    function J(dx, y, dz) { return P(x + dx, y, z + dz); }
+
+    var sw = Math.sin(phase), cw = Math.cos(phase);
+    var side = headX >= 0 ? 1 : -1;
+
+    /* He is skating toward the camera, so "forward" is -z: the shoulders and
+       head lead the skates down the sheet, and he leans further the harder he
+       is cutting. Metres, not degrees — it all goes through P() anyway. */
+    var lean   = 0.46 + Math.abs(cut) * 0.26;
+    var hipDz  = -lean * 0.30, hipY  = 0.86;
+    var shDz   = -lean * 0.95, shY   = 1.38;
+    var headDz = -lean * 1.26, headY = 1.66;
+    var tilt   = cut * 0.42;                       /* roll into the turn */
+
+    /* --- legs: one drives out and back, the other recovers underneath ----- */
+    var pushL = Math.max(0,  sw), pushR = Math.max(0, -sw);
+    var liftL = pushR * 0.17,     liftR = pushL * 0.17;
+
+    var hipL = J(-0.15 + tilt * 0.3, hipY, hipDz), hipR = J(0.15 + tilt * 0.3, hipY, hipDz);
+    var ftL  = J(-0.19 - pushL * 0.72 + tilt * 0.3 + liftL * 0.7, liftL,
+                 hipDz + pushL * 0.54 - liftL * 0.5);
+    var ftR  = J( 0.19 + pushR * 0.72 + tilt * 0.3 - liftR * 0.7, liftR,
+                 hipDz + pushR * 0.54 - liftR * 0.5);
+    /* knee rides inboard of the line hip->foot, which is what sells a stride */
+    var kneeL = J(-0.19 - pushL * 0.3 + tilt * 0.3, 0.46 + liftL * 0.55, hipDz + pushL * 0.2);
+    var kneeR = J( 0.19 + pushR * 0.3 + tilt * 0.3, 0.46 + liftR * 0.55, hipDz + pushR * 0.2);
+    var lift = liftL, lift2 = liftR;
+
+    var wLeg = s * 0.17, wArm = s * 0.12;
+
+    limb(ctx, [hipL, kneeL, ftL], wLeg, KIT.pants);
+    limb(ctx, [hipR, kneeR, ftR], wLeg, KIT.pants);
+
+    /* socks: a band of colour above each skate */
+    limb(ctx, [kneeL, ftL], wLeg * 0.86, KIT.socks);
+    limb(ctx, [kneeR, ftR], wLeg * 0.86, KIT.socks);
+
+    /* skates + their blades */
+    [[ftL, lift], [ftR, lift2]].forEach(function (p) {
+      var ft = p[0], up = p[1];
+      ctx.beginPath();
+      ctx.ellipse(ft.x, ft.y, s * 0.17, s * 0.075, 0, 0, 7);
+      ctx.fillStyle = '#0b0f14'; ctx.fill();
+      if (up < 0.02) {                                  /* blade bites the ice */
+        ctx.beginPath();
+        ctx.ellipse(ft.x, ft.y + s * 0.05, s * 0.2, s * 0.03, 0, 0, 7);
+        ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fill();
+      }
+    });
+
+    /* --- torso: wide pads, narrow waist ---------------------------------- */
+    var twist = sw * 0.1;                          /* shoulders counter the legs */
+    var shL = J(-0.33 + tilt, shY, shDz + twist), shR = J(0.33 + tilt, shY, shDz - twist);
+    ctx.beginPath();
+    ctx.moveTo(hipL.x, hipL.y); ctx.lineTo(shL.x, shL.y);
+    ctx.lineTo(shR.x, shR.y);   ctx.lineTo(hipR.x, hipR.y);
+    ctx.closePath();
+    ctx.fillStyle = KIT.body; ctx.fill();
+
+    /* a blue yoke across the shoulders reads as the jersey at any size */
+    var ykL = J(-0.31 + tilt, shY - 0.2, shDz + twist), ykR = J(0.31 + tilt, shY - 0.2, shDz - twist);
+    ctx.beginPath();
+    ctx.moveTo(shL.x, shL.y); ctx.lineTo(shR.x, shR.y);
+    ctx.lineTo(ykR.x, ykR.y); ctx.lineTo(ykL.x, ykL.y);
+    ctx.closePath();
+    ctx.fillStyle = KIT.trim; ctx.fill();
+
+    /* --- arms: the far one on the stick, the near one driving ------------ */
+    var topHand = J(side * 0.12 + tilt + cw * 0.14, 1.08, shDz - 0.3);
+    var lowHand = J(side * 0.5  + tilt + cw * 0.22, 0.84, shDz - 0.62);
+    limb(ctx, [shL, J(-0.3 + tilt + cw * 0.16, 1.14, shDz - 0.14), topHand], wArm, KIT.sleeve);
+    limb(ctx, [shR, J( 0.34 + tilt - cw * 0.16, 1.12, shDz - 0.2),  lowHand], wArm, KIT.sleeve);
+    /* gloves */
+    [topHand, lowHand].forEach(function (p2) {
+      ctx.beginPath(); ctx.ellipse(p2.x, p2.y, wArm * 0.78, wArm * 0.78, 0, 0, 7);
+      ctx.fillStyle = KIT.trim; ctx.fill();
+    });
+
+    /* --- stick: blade stays on the puck ---------------------------------- */
+    var blade = puck ? P(puck.x, 0.02, puck.z) : J(side * 0.9 + tilt, 0.02, shDz - 1.5);
+    limb(ctx, [topHand, lowHand, blade], Math.max(1, s * 0.045), '#2b3440', 'round');
+    limb(ctx, [blade, P((puck ? puck.x : x + side * 0.9) + side * 0.26, 0.02,
+                        (puck ? puck.z : z) - 0.08)], Math.max(1, s * 0.07), '#161c24', 'round');
+
+    /* --- helmet ----------------------------------------------------------- */
+    var hd = J(tilt + 0.02, headY, headDz), hr = s * 0.15;
+    ctx.beginPath(); ctx.ellipse(hd.x, hd.y, hr, hr * 1.04, 0, 0, 7);
+    ctx.fillStyle = KIT.trim; ctx.fill();
+    /* cage */
+    ctx.beginPath();
+    ctx.ellipse(hd.x, hd.y + hr * 0.5, hr * 0.74, hr * 0.56, 0, 0, Math.PI);
+    ctx.fillStyle = 'rgba(16,22,32,.82)'; ctx.fill();
+  }
+
+
+  /* ---- the warm-up lap ---------------------------------------------------- */
+  /* He is on the ice before the puck is: one slow curl around the far end
+     while the lines are still painting themselves on, finishing exactly where
+     the rush collects him — so the rush reads as him picking the puck up
+     rather than a puck appearing out of nothing. */
+
+  var LAP_C = { x: 0.5, z: 50.5 }, LAP_R = 10.57, LAP_A0 = 0.79, LAP_A1 = 3.39;
+
+  function lapAt(w) {
+    var e = w < 0.5 ? 2 * w * w : 1 - Math.pow(2 - 2 * w, 2) / 2;   /* ease in-out */
+    var a = lerp(LAP_A0, LAP_A1, e);
+    return { x: LAP_C.x + Math.cos(a) * LAP_R, z: LAP_C.z + Math.sin(a) * LAP_R, a: a };
+  }
+
+  /* Two hairlines a blade-width apart, left on the sheet behind him. */
+  function bladeCuts(w) {
+    if (w <= 0.01) return;
+    var N = 60, steps = Math.max(1, Math.ceil(w * N));
+    ictx.save();
+    ictx.lineWidth = 1;
+    ictx.strokeStyle = 'rgba(10,26,43,.06)';
+    for (var e2 = -1; e2 <= 1; e2 += 2) {
+      ictx.beginPath();
+      for (var i = 0; i <= steps; i++) {
+        var q = lapAt(i / N);
+        var s2 = P(q.x + Math.cos(q.a) * 0.17 * e2, 0, q.z + Math.sin(q.a) * 0.17 * e2);
+        i ? ictx.lineTo(s2.x, s2.y) : ictx.moveTo(s2.x, s2.y);
+      }
+      ictx.stroke();
+    }
+    ictx.restore();
+  }
+
   function rush(p, now) {
     var u = clamp((p - P_RUSH) / (P_SHOT - P_RUSH), 0, 1);
     var b = puckAt(u);
@@ -399,7 +560,16 @@
     }
 
     if (u <= 0 || u >= 1) {
-      if (u <= 0) { var q0 = P(LEGS[0].x, 0, LEGS[0].z); drawPuck(ictx, q0.x, q0.y, puckR(q0.s)); }
+      if (u <= 0) {
+        var w = clamp(p / P_RUSH, 0, 1);
+        var lp = lapAt(w);
+        var tx = -Math.sin(lp.a);                     /* tangent to the arc */
+        var reach = Math.hypot(lp.x - LEGS[0].x, lp.z - LEGS[0].z) < 3.2;
+        var q0 = P(LEGS[0].x, 0, LEGS[0].z);
+        bladeCuts(w);
+        skater(ictx, lp.x, lp.z, tx, w * 34, clamp(tx, -1, 1) * 0.45, reach ? LEGS[0] : null);
+        drawPuck(ictx, q0.x, q0.y, puckR(q0.s));
+      }
       return b;
     }
 
@@ -413,6 +583,18 @@
       ictx.fillStyle = 'rgba(255,255,255,' + (0.3 - j * 0.03) + ')';
       ictx.fill();
     }
+
+    /* The carrier: a stick-length behind the puck, facing the way he is
+       going. Drawn before the puck so the blade tucks under it. */
+    var ah = puckAt(u + 0.012), bh = puckAt(u - 0.012);
+    var vx = ah.x - bh.x, vz = ah.z - bh.z;
+    var vl = Math.hypot(vx, vz) || 1;
+    var sx = b.x - (vx / vl) * 1.45, sz = b.z - (vz / vl) * 1.45;
+    skater(ictx, sx, sz, vx, u * 46, clamp(vx / vl, -1, 1), b);
+
+    /* snow off the blades once he is really moving */
+    if (u > 0.04) sprayMark(sx, sz + 0.2, Math.atan2(vz, vx) + Math.PI,
+                            0.35 + 0.3 * Math.abs(vx / vl), 91);
 
     var q = P(b.x, 0, b.z);
     drawPuck(ictx, q.x, q.y, puckR(q.s));

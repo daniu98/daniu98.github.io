@@ -20,7 +20,7 @@ window.SITE = {
   /* Anchors referenced as data-link="key" in index.html */
   links: {
     github:        'https://github.com/daniu98',
-    linkedin:      'https://linkedin.com/in/daniel-xiao',
+    linkedin:      'https://linkedin.com/in/daniel-xiao-9b56613bb',
     resume:        'assets/doc/Daniel-Xiao-Resume.pdf',
     photography:   'creative.html',
 
@@ -32,6 +32,17 @@ window.SITE = {
     treereqSource: 'https://github.com/daniu98/treereq',
     aiaaPaper:     'https://arc.aiaa.org/doi/10.2514/6.2024-4123',
     mnistNotebook: 'https://colab.research.google.com/drive/1HHswCzuCuXArwtf1NBRv7ikT0AHCt6qm?usp=sharing'
+  },
+
+  /* His two actual sweaters. The number plate under the hero photo flips
+     between them; everything numbered on the page follows.
+     `note` is optional — write one line here about why there are two numbers
+     and it appears under the jersey photograph in section 02. Leave it empty
+     and nothing is shown. */
+  kit: {
+    home: { number: '22', label: 'Home', sheet: 'UCLA — Home Sheet' },
+    away: { number: '9',  label: 'Away', sheet: 'UCLA — Away Sheet' },
+    note: ''
   },
 
   /* Images referenced as data-img="key". Each entry is a responsive pair:

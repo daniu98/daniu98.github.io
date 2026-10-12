@@ -30,6 +30,8 @@
   /* The opening only owns the screen when you actually arrive at the top.
      A deep link (#projects) or a restored scroll position skips it, and so
      does coming back within the same tab — it plays once, not every time. */
+  try { de.dataset.kit = localStorage.getItem('kit') === 'away' ? 'away' : 'home'; }
+  catch (e) { de.dataset.kit = 'home'; }
   var seen = false;
   try { seen = sessionStorage.getItem('faceoff:seen') === '1'; } catch (e) {}
   if (seen) de.classList.add('seen');
@@ -103,7 +105,7 @@
   <div class="sb" id="scoreboard" aria-hidden="true">
     <div class="sb-top"><span class="sb-live">&#9679; LIVE</span><span>PERIOD 1</span></div>
     <p class="sb-clock"><span id="sb-clock">16:40</span></p>
-    <div class="sb-foot"><span>PASSES <b id="sb-pass">00</b></span><span>XIAO <b>22</b></span></div>
+    <div class="sb-foot"><span>PASSES <b id="sb-pass">00</b></span><span>XIAO <b id="sb-num">22</b></span></div>
   </div>
 
   <p class="faceoff-hint" id="faceoff-hint" aria-hidden="true">
@@ -144,7 +146,7 @@
       <div class="hero-actions">
         <a class="btn btn--solid" href="#projects">Selected work <span class="arw" aria-hidden="true">↓</span></a>
         <a class="btn btn--ghost" data-link="github" href="https://github.com/daniu98" target="_blank" rel="noopener">GitHub <span class="arw" aria-hidden="true">↗</span></a>
-        <a class="btn btn--ghost" data-link="linkedin" href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">LinkedIn <span class="arw" aria-hidden="true">↗</span></a>
+        <a class="btn btn--ghost" data-link="linkedin" href="https://linkedin.com/in/daniel-xiao-9b56613bb" target="_blank" rel="noopener">LinkedIn <span class="arw" aria-hidden="true">↗</span></a>
         <a class="btn btn--ghost" data-link="resume" href="assets/doc/Daniel-Xiao-Resume.pdf" target="_blank" rel="noopener">Résumé <span class="arw" aria-hidden="true">↗</span></a>
       </div>
     </div>
@@ -158,8 +160,11 @@
              alt="Daniel Xiao in a white UCLA jersey, tracking the play during a game">
       </div>
       <figcaption>
-        <span>UCLA — Home Sheet</span>
-        <span>No. 22</span>
+        <span id="kit-sheet">UCLA — Home Sheet</span>
+        <button type="button" class="kit-toggle" id="kit-toggle" aria-pressed="false">
+          <span class="kit-no">No. <b id="kit-number">22</b></span>
+          <span class="kit-side" id="kit-side">Home</span>
+        </button>
       </figcaption>
     </figure>
   </div>
@@ -249,6 +254,7 @@
                alt="Daniel Xiao skating away from the camera, XIAO and the number 9 across the back of his jersey">
         </div>
         <figcaption>Back of the jersey — Xiao, 9</figcaption>
+        <p class="kit-note" id="kit-note" hidden></p>
       </figure>
 
       <div class="ice-notes">
@@ -702,7 +708,7 @@
         <p class="k">GitHub</p>
         <p class="v">@daniu98 <span class="arw" aria-hidden="true">↗</span></p>
       </a>
-      <a data-magnet data-link="linkedin" href="https://linkedin.com/in/daniel-xiao" target="_blank" rel="noopener">
+      <a data-magnet data-link="linkedin" href="https://linkedin.com/in/daniel-xiao-9b56613bb" target="_blank" rel="noopener">
         <p class="k">LinkedIn</p>
         <p class="v">in/daniel-xiao <span class="arw" aria-hidden="true">↗</span></p>
       </a>

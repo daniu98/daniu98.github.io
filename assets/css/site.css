@@ -1302,12 +1302,20 @@ html:not(.js) #ring { display: none; }
   text-shadow: 9px 9px 0 var(--red);
   transform: scale(calc(.72 + var(--k, 0) * .28));
 }
+/* The puck arrives dead centre, so the radar line sits low in the frame
+   rather than under the word, where the puck would cover it. */
 .shot-call em {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(64px, 13vh, 124px);
+  transform: translateX(-50%);
   font-family: var(--mono);
   font-style: normal;
   font-size: clamp(10px, 1.1vw, 13px);
   letter-spacing: .3em;
+  white-space: nowrap;
   color: rgba(255, 255, 255, .88);
+  text-shadow: 0 1px 12px rgba(4, 9, 15, .9);
 }
 
 /* The hero, now the last beat of the sequence */
@@ -1375,7 +1383,8 @@ html.seen #rink { height: auto; background: var(--ice); }
 html.rm #rink .stage,
 html.seen #rink .stage { position: static; height: auto; overflow: visible; }
 html.rm #rink .hero,
-html.seen #rink .hero { position: relative; inset: auto; opacity: 1; visibility: visible; padding-top: clamp(104px, 13vh, 150px); }
+html.seen #rink .hero,
+html:not(.js) #rink .hero { position: relative; inset: auto; opacity: 1; visibility: visible; padding-top: clamp(104px, 13vh, 150px); }
 html.rm #ice, html.rm #shotfx, html.rm #spray, html.rm .sb,
 html.rm .faceoff-hint, html.rm .faceoff-skip, html.rm .shot-call { display: none; }
 
@@ -1802,6 +1811,73 @@ body.hovering #ring {
   .hero-actions .btn--ghost { flex: 1 1 auto; justify-content: center; padding-inline: 12px; gap: 7px; }
   .faceoff { opacity: .45; right: -52%; top: 6%; }
   .rail figure { flex-basis: 74vw; }
+}
+
+/* ---------- 15z. Home / away sweater ---------------------------------------
+   His two real numbers: #22 on the white home sheet, #9 on the blue-and-gold
+   away. The plate under the hero photograph flips between them and everything
+   numbered on the page follows.
+
+   `--kit` is deliberately NOT the global accent. It reaches four things — the
+   section numerals, the monogram dot, the number plate and the scoreboard —
+   and nothing that carries a contrast obligation: focus rings, ::selection,
+   the scroll progress bar and hover borders all stay rink red. UCLA blue is
+   used rather than the kit's gold because gold cannot clear AA on ice white.  */
+
+:root                      { --kit: var(--red); }
+html[data-kit="away"]      { --kit: var(--blue); }
+.sec--dark                 { --kit: var(--on-navy-red); }
+html[data-kit="away"] .sec--dark { --kit: #8fc0f2; }
+
+.eyebrow .num   { color: var(--kit); }
+.monogram .dot  { background: var(--kit); }
+
+/* the plate itself */
+.kit-toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0 3px 0;
+  font: inherit;
+  color: var(--muted);
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: color .2s var(--ease);
+}
+.kit-toggle b { color: var(--kit); font-weight: 500; transition: color .25s var(--ease); }
+.kit-toggle .kit-side {
+  padding: 2px 6px;
+  font-size: 9px;
+  letter-spacing: .16em;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  transition: border-color .2s var(--ease), color .2s var(--ease);
+}
+.kit-toggle:hover { color: var(--navy); }
+.kit-toggle:hover .kit-side { border-color: var(--kit); color: var(--navy); }
+
+/* one optional line under the jersey photograph */
+.kit-note {
+  margin-top: 10px;
+  max-width: 44ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--fg-3);
+  border-left: 2px solid var(--kit);
+  padding-left: 12px;
+}
+
+/* ---------- 16b. Touch targets ---------------------------------------------
+   Everything clears the WCAG 2.2 minimum at any size, but on a coarse pointer
+   the small controls get grown to the 44px platform guideline. Desktop keeps
+   its tighter density. */
+
+@media (pointer: coarse) {
+  .demo-btn   { min-height: 44px; padding-block: 12px; }
+  .rail-btn   { width: 44px; height: 44px; }
+  .nav-toggle { min-width: 44px; min-height: 44px; }
+  .faceoff-skip { min-height: 44px; padding-block: 13px; }
+  .proj-links a, .beyond-col .more { padding-bottom: 10px; }
 }
 
 /* ---------- 17. Motion & print -------------------------------------------- */
