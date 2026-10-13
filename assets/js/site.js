@@ -300,8 +300,28 @@
     });
   }
 
+  /* --- 12. Shift chart -> experience row -----------------------------------
+     Pointing at a shift lights the row it belongs to. Nothing moves; it is
+     just a highlight, and the chart reads fine without it. */
+  function initShifts() {
+    var bars = document.querySelectorAll('.shift-bar[data-shift]');
+    if (!bars.length) return;
+    bars.forEach(function (bar) {
+      var row = document.querySelector('.cv-row[data-role="' + bar.getAttribute('data-shift') + '"]');
+      if (!row) return;
+      bar.setAttribute('tabindex', '0');
+      var on  = function () { row.classList.add('lit'); };
+      var off = function () { row.classList.remove('lit'); };
+      bar.addEventListener('pointerenter', on);
+      bar.addEventListener('pointerleave', off);
+      bar.addEventListener('focus', on);
+      bar.addEventListener('blur', off);
+    });
+  }
+
   function init() {
     applyConfig();
+    initShifts();
     initHeaderInert();
     initKit();
     initOpening();

@@ -1852,6 +1852,116 @@ html[data-kit="away"] .sec--dark { --kit: #8fc0f2; }
   padding-left: 12px;
 }
 
+/* ---------- 15x. Shift chart ----------------------------------------------
+   The same dates as the rows beneath it, laid on one axis the way a coach
+   reads a game afterwards. The point is the overlaps: three roles running at
+   once through the summer of 2026. Positions are percentages of a Jan 2023 -
+   Dec 2026 axis, set inline, so the chart is right with JavaScript off. */
+
+.shifts {
+  margin: 0 0 clamp(40px, 5vw, 66px);
+  padding-bottom: clamp(26px, 3vw, 38px);
+  border-bottom: 1px solid var(--line);
+}
+.shifts-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 18px;
+  margin-bottom: clamp(18px, 2.2vw, 26px);
+}
+.shifts-note {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.shifts-plot { position: relative; }
+
+/* year ticks, drawn as hairlines the lanes sit on top of */
+.shifts-axis {
+  position: relative;
+  height: 18px;
+  margin-bottom: 6px;
+}
+.shifts-axis span {
+  position: absolute;
+  left: calc(var(--s) * 1%);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  color: var(--muted);
+}
+.shifts-axis span::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16px;
+  width: 1px; height: calc(var(--rows, 5) * 30px);
+  background: var(--line-soft);
+}
+
+.shifts-rows { display: grid; gap: 4px; position: relative; }
+.shifts-rows li {
+  display: grid;
+  grid-template-columns: minmax(96px, 150px) minmax(0, 1fr) minmax(104px, auto);
+  align-items: center;
+  gap: clamp(10px, 1.6vw, 20px);
+  min-height: 26px;
+}
+.shift-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--steel);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shift-when {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.shift-lane { position: relative; height: 14px; }
+.shift-lane::before {                       /* the empty sheet behind the shift */
+  content: '';
+  position: absolute;
+  inset: 6px 0;
+  background: var(--line-soft);
+}
+.shift-bar {
+  position: absolute;
+  top: 0;
+  left: calc(var(--s) * 1%);
+  width: calc(var(--w) * 1%);
+  height: 14px;
+  background: var(--navy);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .7s var(--ease), background-color .2s var(--ease);
+}
+.js .reveal.in .shift-bar, html:not(.js) .shift-bar, html.rm .shift-bar { transform: none; }
+.shift-bar.is-now { background: var(--kit); }
+.shift-bar.is-edu {
+  background: repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 10px);
+  height: 8px;
+  top: 3px;
+}
+.shifts-edu .shift-name, .shifts-edu .shift-when { color: var(--muted); }
+
+/* hovering a shift dims the others and lights the matching row below */
+.shifts-plot:hover .shift-bar:not(:hover):not(.is-edu) { background: #b9c6d2; }
+.cv-row.lit { background: var(--paper); box-shadow: inset 2px 0 0 var(--kit); }
+
+@media (max-width: 680px) {
+  .shifts-rows li { grid-template-columns: minmax(84px, 1fr) minmax(0, 2.2fr); }
+  .shift-when { display: none; }
+  .shifts-axis span:nth-child(even) { display: none; }
+}
+
 /* ---------- 15y. "Watch the opening" --------------------------------------
    Deliberately quiet: the page's job is the work, and the rink sequence is an
    aside for anyone who wants it. Hidden entirely without JavaScript and under
